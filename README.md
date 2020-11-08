@@ -19,6 +19,7 @@ To install the code:
 
 1. Download from here.
 1. Send the JCL members to a JCL PDS(E) on the z/OS LPAR you intend to run the code on.
+1. Send the CTL member to another FB80 PDS(E) of your choosing.
 1. Edit and submit the ASMEXIT job, assembling and link editing into a load library of your choosing.
 1. Extract a small set of SMF 101 data and point at it (via SORTIN) in an edited version of the BUILDDB job.
 
@@ -26,7 +27,18 @@ All the jobs should return RC=0. The test with the small set of SMF 101 data sho
 
 "Editing" means finding the variables, denoted by `<...>` and changing them to values that work for you.
 
+Note the line
+
+    DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM) 
+
+This member is the DFSORT Symbols deck that the build job and reporting jobs will use to map the flat files created by BUILDDB.
+
 ## Use
 
 Once you've established the BUILDDB job works you can modify it so the SORTIN points to an appropriate source. Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 Reporting jobs, obviously need to point to the right "database" input data sets.
+
+Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM` to map the database data sets.
+
+**Pro Tip:** You can concatenate your own symbols deck after this symbols file.
+Generally I use inline symbols, but you can "harden" them in a file of your own.
