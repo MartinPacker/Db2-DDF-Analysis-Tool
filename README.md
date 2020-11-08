@@ -1,4 +1,4 @@
-# Db2-DDF-Analysis-Tool
+# Db2 DDF Analysis Tool
 
 Db2 DDF Analysis Tool is a set of DFSORT programs to report on Db2 Accounting Trace (SMF 101), specifically for DDF applications.
 
@@ -26,8 +26,8 @@ The intention is to add more reporting samples, and for users to generate their 
 To install the code:
 
 1. Download from here.
-1. Send the JCL members to a JCL PDS(E) on the z/OS LPAR you intend to run the code on.
-1. Send the CTL member to another FB80 PDS(E) of your choosing.
+1. Upload the JCL members to a JCL PDS(E) on the z/OS LPAR you intend to run the code on.
+1. Upload the CTL member to another FB80 PDS(E) of your choosing.
 1. Edit and submit the ASMEXIT job, assembling and link editing into a load library of your choosing.
 `<SDSNMACS>` needs to be changed to point at your Db2 installation macro library.
 1. Extract a small set of SMF 101 data and point at it (via SORTIN) in an edited version of the BUILDDB job.
@@ -36,13 +36,13 @@ To install the code:
 
 All the jobs should return RC=0. The test with the small set of SMF 101 data should suffice for Installation Verification.
 
-"Editing" means finding the variables, denoted by `<...>` and changing them to values that work for you.
+"Editing" means finding the variables, denoted by `<...>` and changing them to values that work for you. See [Tailoring](#tailoring) for the variables you will need to alter.
 
 Note the line
 
     DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM) 
 
-This member is the SORT Symbols deck that the build job and reporting jobs will use to map the flat files created by BUILDDB.
+This member is the SORT Symbols deck (SYMNAMES DD) the build job and reporting jobs will use to map the flat files created by BUILDDB.
 
 ## Use
 
@@ -55,7 +55,7 @@ In use there are two distinct phases:
 
 You probably want to build the database more than just on a one-off basis.
 
-Once you've established the BUILDDB job works you can modify it so the SORTIN points to an appropriate source.
+Once you've established the BUILDDB job works you can modify it so the SORTIN DD points to an appropriate source.
 Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 
 **Note:** If you have turned on Db2's Accounting Trace Compression you will need to decompress the records before passing them to the database build job.
@@ -83,3 +83,26 @@ If you follow the above naming convention sample reporting jobs should be able t
 
 **Note:** Because this is RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
+
+
+### Sample Reporting Program SSIDCORR
+
+This is a two step SORT program, showing many of the most useful techniques.
+It comprises two steps:
+
+1. SUMSSIDS - Producing a list of Db2 subsystem IDs
+1. SUMCORRS - Producting a list of Db2 correlation IDs
+
+The output from this will be two Comma-Separated-Value members of the reporting data set - SUMSSIDS and SUMCORRS.
+A reasonable step would be to download these and import them into a spreadsheet, where you could sort them on a number of columns and report on them.
+(This repository doesn't currently contain any workstation code.)
+
+## Tailoring
+
+You will need to globally edit the following variables to suit your environment:
+
+* **&lt;HLQ&gt;** - High Level Qualifier e.g. `PACKER`.
+* **&lt;QUAL2&gt;** - Second Level Qualifier e.g. `CLIENTA`. I would not make this more than 1 level as some of the data sets will run out of qualifiers.
+* **&lt;SYSOUT&gt;** - SYSOUT specification e.g. `K,HOLD=YES`.
+* **&lt;SDSNMACS&gt;** - Db2 Macro Library e.g. `DB2.V12.SDSNMACS`.
+* **&lt;UNIT&gt;** - Disk unit e.g. `SYSDA`.
