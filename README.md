@@ -38,7 +38,7 @@ This member is the DFSORT Symbols deck that the build job and reporting jobs wil
 Once you've established the BUILDDB job works you can modify it so the SORTIN points to an appropriate source. Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 Reporting jobs, obviously need to point to the right "database" input data sets.
 
-Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM` to map the database data sets.
+Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)` to map the database data sets.
 
 **Pro Tip:** You can concatenate your own symbols deck after this symbols file.
 Generally I use inline symbols, but you can "harden" them in a file of your own.
