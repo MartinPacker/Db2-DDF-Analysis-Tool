@@ -2,14 +2,17 @@
 
 Db2 DDF Analysis Tool is a set of DFSORT programs to report on Db2 Accounting Trace (SMF 101), specifically for DDF applications.
 
-(When we say "DFSORT", the code has not been tested on any other sort product - but few if any problems are expected. Reports of compatibility would be gratefully received)
+(When we say "DFSORT", the code has not been tested on any other sort product - but few if any problems are expected. Reports of compatibility would be gratefully received. In the rest of this guide we will use the term "SORT" - for both DFSORT and its competitors.)
+
+**Note:** The code relies on at least Accounting Trace Classes 1,2, and 3 on in the records.
+There is further value in having Package-Level Accounting (Trace Classes 7,8, and 10) enabled - but this is not required.
 
 ## Repository Contents
 
 This initial release consists of the following programs:
 
 1. ASMEXIT to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
-1. BUILDDB to read SMF 101 data and, using the exit and DFSORT to write a number of flat files. These files are what reporting code (generally DFSORT or ICETOOL but could be eg REXX) can run against.
+1. BUILDDB to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
 
 The intention is to add reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -31,14 +34,41 @@ Note the line
 
     DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM) 
 
-This member is the DFSORT Symbols deck that the build job and reporting jobs will use to map the flat files created by BUILDDB.
+This member is the SORT Symbols deck that the build job and reporting jobs will use to map the flat files created by BUILDDB.
 
 ## Use
 
-Once you've established the BUILDDB job works you can modify it so the SORTIN points to an appropriate source. Likewise you can modify the OUTFIL data sets to point to appropriate targets.
+In use there are two distinct phases:
+
+1. Building the flat file database from raw SMF 101 records.
+1. Reporting.
+
+### Building The Database
+
+You probably want to build the database more than just on a one-off basis.
+
+Once you've established the BUILDDB job works you can modify it so the SORTIN points to an appropriate source.
+Likewise you can modify the OUTFIL data sets to point to appropriate targets.
+
+**Note:** If you have turned on Db2's Accounting Trace Compression you will need to decompress the records before passing them to the database build job.
+
+### Reporting
+
 Reporting jobs, obviously need to point to the right "database" input data sets.
 
 Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)` to map the database data sets.
 
 **Pro Tip:** You can concatenate your own symbols deck after this symbols file.
 Generally I use inline symbols, but you can "harden" them in a file of your own.
+
+You will need to allocate a report data set. It should be a PDS(E) with a LRECL of at least 4096 and a RECFM of VB.
+
+Here's a sample JCL step to allocate the reporting data set.
+
+    //ALDDFRPT EXEC PGM=IEFBR14
+    //REPORT   DD DISP=(NEW,CATLG),
+    //            SPACE=(CYL,(50,50,20)),UNIT=<UNIT>,
+    //            DCB=(RECFM=VB,BLKSIZE=0,LRECL=4096),
+    //            DSN=<HLQ>.<QUAL2>.DDF.REPORTS
+
+If you follow the above naming convention sample reporting jobs should be able to allocate it, writing the reports to its members.
