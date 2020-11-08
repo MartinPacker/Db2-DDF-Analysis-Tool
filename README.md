@@ -6,10 +6,10 @@ Db2 DDF Analysis Tool is a set of DFSORT programs to report on Db2 Accounting Tr
 
 **Notes**
 
-1. The code relies on at least Accounting Trace Classes 1,2, and 3 on in the records.
-There is further value in having Package-Level Accounting (Trace Classes 7,8, and 10) enabled - but this is not required.
+1. The code relies on at least Accounting Trace Classes 1, 2, and 3 being enabled in the records.
+There is further value in having Package-Level Accounting (Trace Classes 7, 8, and 10) enabled - but this is not required.
 2. You will need Db2 installed, or at least the Db2 installation macro library (commonly known as SDSNMACS).
-This tool has only (recently) been tested with Db2 Version 12, though it has worked previously with Version 11.
+This tool has only (recently) been tested with Db2 Versions 11 and 12, though it has worked previously with Version 10.
 
 ## Repository Contents
 
@@ -96,6 +96,10 @@ It comprises two steps:
 The output from this will be two Comma-Separated-Value members of the reporting data set - SUMSSIDS and SUMCORRS.
 A reasonable step would be to download these and import them into a spreadsheet, where you could sort them on a number of columns and report on them.
 (This repository doesn't currently contain any workstation code.)
+
+One technique of note is to concatenate further symbols to the SYMNAMES DD.
+The symbols beginning with `_` are as a result of the INREC statement.
+To make this work you need to have a `POSITION,1` statement before these symbols.
 
 ## Tailoring
 
