@@ -59,6 +59,8 @@ Once you've established the BUILDDB job works you can modify it so the SORTIN DD
 Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 
 **Note:** If you have turned on Db2's Accounting Trace Compression you will need to decompress the records before passing them to the database build job.
+The best way to decompress the data is by assembling, link-editing and running the Db2-supplied DSNTSMFD program. It is in the Db2 SDSNSAMP library.
+The most common symptom of running the database build against compressed data is a S0C7 ABEND.
 
 ### Reporting
 
