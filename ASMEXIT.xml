@@ -1,0 +1,1372 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workflow>
+    <autoTakeOwnership>false</autoTakeOwnership>
+    <workflowInfo>
+        <workflowID scope="none">Db2 DDF Analysis Tool - E15 Exit Assembly/Linkedit</workflowID>
+        <workflowDescription>Assemble the E15 exit used by the database build job.</workflowDescription>
+        <workflowVersion>2020-11-09</workflowVersion>
+        <vendor>Open Source</vendor>
+        <General/>
+    </workflowInfo>
+    <variable name="SDSNMACS" scope="instance" visibility="private">
+        <label>SDSNMACS macro library name</label>
+        <abstract>SDSNMACS macro library name</abstract>
+        <description>Used to provide Db2 Accounting Trace section mapping macros.</description>
+        <category>General</category>
+        <string valueMustBeChoice="false" multiLine="false">
+            <minLength>8</minLength>
+            <maxLength>44</maxLength>
+            <default>DB2.V12R0M0.SDSNMACS</default>
+        </string>
+    </variable>
+    <variable name="HLQ" scope="instance" visibility="private">
+        <label>High Level Qualifier</label>
+        <abstract>Installation HLQ</abstract>
+        <description>HLQ for installation data sets</description>
+        <category>General</category>
+        <string valueMustBeChoice="false" multiLine="false">
+            <minLength>1</minLength>
+            <maxLength>8</maxLength>
+        </string>
+    </variable>
+    <variable name="QUAL2" scope="instance" visibility="private">
+        <label>Second Level Qualifier For Installation Data Sets</label>
+        <abstract>Second Level Qualifier For Installation Data Sets</abstract>
+        <description>Second Level Qualifier For Installation Data Sets</description>
+        <category>General</category>
+        <string valueMustBeChoice="false" multiLine="false">
+            <minLength>1</minLength>
+            <maxLength>8</maxLength>
+        </string>
+    </variable>
+    <variable name="UNIT" scope="instance" visibility="private">
+        <label>Unit Name</label>
+        <abstract>Unit Name for disk</abstract>
+        <description>Unit Name for disk</description>
+        <category>General</category>
+        <string valueMustBeChoice="false" multiLine="false">
+            <minLength>1</minLength>
+            <maxLength>8</maxLength>
+            <default>SYSDA</default>
+        </string>
+    </variable>
+    <variable name="SYSOUT" scope="instance" visibility="private">
+        <label>SYSOUT string</label>
+        <abstract>SYSOUT string</abstract>
+        <description>SYSOUT string</description>
+        <category>General</category>
+        <string valueMustBeChoice="false" multiLine="false">
+            <default>A</default>
+        </string>
+    </variable>
+    <atCreate name="HLQ" scope="instance" required="true" prompt="true"/>
+    <atCreate name="QUAL2" scope="instance" required="true" prompt="true"/>
+    <atCreate name="SDSNMACS" scope="instance" required="true" prompt="true"/>
+    <atCreate name="UNIT" scope="instance" required="true" prompt="true"/>
+    <atCreate name="SYSOUT" scope="instance" required="true" prompt="true"/>
+    <step name="Assembly-Linkedit" optional="false">
+        <title>Assemble And Linkedit The E15 Exit</title>
+        <description>Run a job to assemble the E15 Exit and Linkedit it</description>
+        <variableValue name="HLQ" scope="instance" noPromptIfSet="false" required="false"/>
+        <variableValue name="QUAL2" scope="instance" noPromptIfSet="false" required="false"/>
+        <variableValue name="SDSNMACS" scope="instance" noPromptIfSet="false" required="false"/>
+        <variableValue name="SYSOUT" scope="instance" noPromptIfSet="false" required="false"/>
+        <variableValue name="UNIT" scope="instance" noPromptIfSet="false" required="false"/>
+        <instructions substitution="true">Set the HLQ, QUAL2, UNIT, SYSOUT, and SDSNMACS variables before running this step.</instructions>
+        <weight>1</weight>
+        <autoEnable>false</autoEnable>
+        <canMarkAsFailed>false</canMarkAsFailed>
+        <template>
+            <inlineTemplate substitution="true">//ASM      PROC NAME=,
+//             SYSLMOD=${instance-HLQ}.${instance-QUAL2}.LOAD
+//ASM      EXEC PGM=ASMA90,PARM='NOXREF,NOESD,NORLD,OBJECT,NODECK'
+//SYSLIB   DD  DISP=SHR,DSN=SYS1.MACLIB
+//SYSUT1   DD  UNIT=${instance-UNIT},SPACE=(CYL,(5,5))
+//SYSUT2   DD  UNIT=${instance-UNIT},SPACE=(CYL,(2,1))
+//SYSUT3   DD  UNIT=${instance-UNIT},SPACE=(CYL,(2,1))
+//SYSPRINT DD  SYSOUT=${instance-SYSOUT},DCB=(BLKSIZE=3146)
+//SYSLIN   DD  UNIT=${instance-UNIT},SPACE=(CYL,(1,1)),
+//       DISP=(,PASS),DCB=(BLKSIZE=3120)
+//LKED     EXEC PGM=HEWL,COND=(8,LE,ASM),
+//        PARM='MAP,LIST,NCAL,LET,SIZE=(490K,40K),AMODE=24,RMODE=24'
+//SYSLIN   DD  DSN=*.ASM.SYSLIN,DISP=(OLD,DELETE)
+//         DD  DDNAME=SYSIN
+//SYSUT1   DD  UNIT=${instance-UNIT},SPACE=(3156,(24,20))
+//SYSPRINT DD  SYSOUT=${instance-SYSOUT},DCB=(BLKSIZE=2420,LRECL=121,RECFM=FBSA)
+//SYSLMOD  DD  DISP=SHR,DSN=&amp;SYSLMOD(&amp;NAME)
+//         PEND
+//* THIS STEP CHECKS IF LOAD LIBRARY ALREADY EXISTS
+//* SETS NON-ZERO RETURN CODE IF IT DOESN'T
+//LISTLOAD EXEC PGM=IDCAMS
+//SYSPRINT DD SYSOUT=${instance-SYSOUT}
+//SYSIN    DD *
+     LISTCAT ENTRY('${instance-HLQ}.${instance-QUAL2}.LOAD')
+/*
+//* ALLOCATE LOAD LIBRARY IF IT DOESN'T EXIST (RC&gt;0)
+//ALLCLOAD EXEC PGM=IEFBR14,COND=(0,EQ,LISTLOAD)
+//NEWLOAD  DD DSN=${instance-HLQ}.${instance-QUAL2}.LOAD,
+//        DISP=(NEW,CATLG),
+//        UNIT=${instance-UNIT},SPACE=(CYL,(10,10,20)),
+//        DCB=(RECFM=U,LRECL=0,BLKSIZE=0),DSNTYPE=LIBRARY
+//*
+//AMSLE    EXEC ASM,NAME=E15DDFID,
+//             SYSLMOD=${instance-HLQ}.${instance-QUAL2}.LOAD
+//SYSLIB   DD DISP=SHR,
+//            DSN=SYS1.MACLIB
+//         DD DISP=SHR,
+//            DSN=${instance-SDSNMACS}
+//SYSIN        DD *
+         TITLE 'E15DDFID - E15 TO EXTRACT DDF IDENTIFIERS FROM 101'
+         PRINT NOGEN
+E15DDFID START 0
+E15      CSECT
+***********************************************************************
+*                                                                     *
+*  E15DDFID - E15 to extract DDF identifiers from SMF 101             *
+*                                                                     *
+*  This E15 exit takes information from the Product Section of an SMF *
+* 101 and writes it out as a record.                                  *
+*                                                                     *
+***********************************************************************
+R0        EQU   0
+R1        EQU   1
+R2        EQU   2
+R3        EQU   3
+R4        EQU   4
+R5        EQU   5
+R6        EQU   6
+R7        EQU   7
+R8        EQU   8
+R9        EQU   9
+R10       EQU   10
+R11       EQU   11
+R12       EQU   12
+R13       EQU   13
+R14       EQU   14
+R15       EQU   15
+*
+          USING E15,R12
+*
+          STM   R14,R12,12(R13)      SAVE ALL REGISTERS EXCEPT 13
+          LA    R12,0(0,R15)
+          ST    R13,REGISTER_SAVE_AREA+4
+          LA    R14,REGISTER_SAVE_AREA
+          ST    R14,8(R13)
+          LR    R13,R14
+*
+* SAVE PARM LIST POINTER IN R2
+          LR    R2,R1
+*
+* SAVE RECORD POINTER
+          L     R3,0(,R2)
+          ST    R3,RECORD_POINTER
+*
+* CHECK FOR FIRST RECORD AND IF SO RESET FLAG AND DO SET UP
+          CLC   FIRST_RECORD_FLAG,=F'0'
+          BNZ   PROC_REC1
+*
+* CHECK IF THERE'S A RECORD AND IF SO PROCESS IT
+CHK_NOREC LTR   R3,R3
+          BNZ   CHK_101
+*
+* PROCESSING WHEN ALL RECORDS HAVE BEEN READ
+*
+* FREE GETMAIN'ED STORAGE
+EOF       FREEMAIN R,LV=32768,A=OUT_BUFFER
+          FREEMAIN R,LV=TS_LENGTH,A=TEMP_STOR
+*
+          SR    R1,R1
+          LA    R15,8                EOF SO DON'T RETURN
+*
+GOBACK    L     R13,4(,R13)
+          L     R14,12(,R13)
+          LM    R2,R12,28(R13)
+          BR    R14
+*
+* FLAG THE RECORD IS PASSED BACK CHANGED
+CHANGED   SR    R15,R15
+          B     GOBACK
+*
+* REJECT THE RECORD
+REJECT    LA    R15,4
+          B     GOBACK
+*
+* RESET FIRST RECORD FLAG
+PROC_REC1 XC FIRST_RECORD_FLAG,FIRST_RECORD_FLAG
+*
+* OBTAIN TEMPORARY STORAGE AREA
+          GETMAIN R,LV=TS_LENGTH
+          ST    R1,TEMP_STOR
+*
+* OBTAIN 32K FOR MODIFIED RECORD
+          GETMAIN R,LV=32768
+          ST    R1,OUT_BUFFER
+*
+* ZERO OUT BDW
+          USING RC,R1
+          XC RCBDW,RCBDW
+          DROP R1
+*
+          B     CHK_NOREC
+*
+* PROCESS EACH DATA RECORD
+*
+* REJECT RECORD IF NOT TYPE 101
+CHK_101   CLI   5(R3),101
+          BNE   REJECT
+*
+* POINT AT OUTPUT RECORD AREA
+          L     R4,TEMP_STOR
+          USING TEMP,R4
+*
+* POINT AT OUTPUT RECORD AREA
+          L     R5,OUT_BUFFER
+          USING RC,R5
+          USING SM101,R3
+*
+* MAKE R11 POINT TO TRIPLETS
+          LA    R11,SM101END
+          USING QWA0,R11
+*
+          LR    R10,R3
+          A     R10,QWA01PSO             CALCULATE PROD SECT ADDR
+*
+          USING QWHS,R10
+*
+* Handle IFCID 3 differently from 239
+          CLC   QWHSIID,=H'0003'
+          BNE   IFCID239
+*
+* Move IFCID (in this case 3) to output record
+          LH    R6,QWHSIID
+          STH   R6,RCIFCID
+*
+* Move QWHS eyecatcher into output record
+          MVC   RCQWHS,=C'QWHSMGLP'
+*
+* Move LWID into output record
+          MVC   RCLWID,QWHSLWID
+*
+* Move QWHSLOCN into output record
+          MVC   RCQWHSLOCN,QWHSLOCN
+*
+          SR    R6,R6
+          LH    R6,QWHSLEN
+          AR    R10,R6                  CORRELATION SECTION FOLLOWS
+          DROP  R10
+          USING QWHC,R10
+*
+* Reject non-DDF stuff, storing QWHCATYP in both DUW and RUW cases
+          L     R6,QWHCATYP
+          C     R6,=F'00000007'
+          BE    IS_DDF
+*
+          C     R6,=F'00000008'        Is not DUW so try RUW
+          BE    IS_DDF
+*
+* See if QLAC as that would make it DDF
+* (R6 still has QWHCATYP)
+          SR    R7,R7
+          LH    R7,QWA01R5N
+*
+          LTR   R7,R7
+          BZ    REJECT
+*
+IS_DDF    ST    R6,RCATYP
+*
+* Clear QMDA fields. They'll be filled in later if we have any
+          MVC   RCQMDA,=C'QMDAMGLP'
+          XC    RCASLN,RCASLN
+          MVI   RCAINF,X'40'
+          MVC   RCAINF+1,RCAINF
+*
+* Clear QWAX fields. They'll be filled in later if we have any
+          MVC   RCQWAX,=C'QWAXMGLP'
+          XC    RCOTSE,RCOTSE
+          XC    RCALOG,RCALOG
+          XC    RCAWAR,RCAWAR
+          XC    RCALCT,RCALCT
+          XC    RCANAR,RCANAR
+*
+* Move selection stuff into output record
+*
+* Time gets broken down into hours and minutes
+          L     R6,6(R3)
+          ST    R6,RCTIME
+*
+* Hour - store bottom two bytes of packed
+          SRDA  R6,32(0)
+          D     R6,=F'360000'
+          CVD   R7,TEMPPACK
+          MVC   RCHOUR,TEMPPACK2
+*
+* Minute - store bottom two bytes of packed
+          SRDA  R6,32(0)
+          D     R6,=F'6000'
+          CVD   R7,TEMPPACK
+          MVC   RCMIN,TEMPPACK2
+*
+* Second - store bottom two bytes of packed
+          SRDA  R6,32(0)
+          D     R6,=F'100'
+          CVD   R7,TEMPPACK
+          MVC   RCSEC,TEMPPACK2
+*
+* Hundredths of a second - store bottom two bytes of packed
+          CVD   R6,TEMPPACK
+          MVC   RCHUN,TEMPPACK2
+*
+* Date portion of SMF timestamp
+          L     R6,10(R3)
+          ST    R6,RCDATE
+*
+* SMFID
+          L     R6,14(R3)
+          ST    R6,RCSMFID
+*
+* DB2 SSID
+          L     R6,18(R3)
+          ST    R6,RCSSID
+*
+* DB2 AUTHID
+          MVC   RCAID,QWHCAID
+*
+* Basic assumption is Corrid is not CICS so move as is
+          MVC   RCCV,QWHCCV
+*
+* Test if corrid is CICS and then translate if it is
+          CLC   FIRST4,=C'ENTR'
+          BE    DO_CICS            Entry thread
+*
+          CLC   FIRST4,=C'POOL'
+          BE    DO_CICS            Pool thread
+*
+* Not CICS so skip CICS-specific processing
+          B     AFTER_CICS
+*
+* Is CICS so move bytes 4 to 8 to front of RCCV and clear rest
+DO_CICS   MVC   THIRD4,SECOND4
+          MVC   FIRST8,=C'CICS Tx '
+*
+AFTER_CICS EQU *
+          MVC   RCCN,QWHCCN
+          MVC   RCPLAN,QWHCPLAN
+          MVC   RCOPID,QWHCOPID
+          MVC   RCTOKN,QWHCTOKN
+          MVC   RCEUID,QWHCEUID
+          MVC   RCEUTX,QWHCEUTX
+          MVC   RCEUWN,QWHCEUWN
+*
+          SR    R6,R6
+          LH    R6,QWHCLEN
+          AR    R10,R6                  CPU SECTION FOLLOWS
+          DROP  R10
+          USING QWHU,R10
+          CLI   QWHUTYP,QWHSHU08
+          BNE   NO_QWHU
+*
+          SR    R6,R6
+          LH    R6,QWHULEN
+          AR    R10,R6                  DISTRIBUTED SECTION FOLLOWS
+*
+          DROP  R10
+          USING QWHD,R10
+*
+NO_QWHU   MVC   RCIPADDR,QWHDRQNM
+          MVC   RCQWHDSVNM,QWHDSVNM
+*
+* Decide whether we have a QMDA to copy from
+          SR    R10,R10
+          LH    R10,QWA01R6N
+          LTR   R10,R10
+          BZ    AFTER_QMDA
+*
+          LR    R10,R3
+          A     R10,QWA01R6O             CALCULATE QMDA SECT ADDR
+*
+          USING QMDA,R10
+*
+          MVC   RCASLN,QMDAASLN
+          MVC   RCAINF,QMDAAINF
+*
+          DROP  R10
+*
+AFTER_QMDA EQU *
+          LR    R10,R3
+          A     R10,QWA01R1O             CALCULATE QWAC SECT ADDR
+          USING QWAC,R10
+*
+          MVC   RCQWAC,=C'QWACMGLP'
+*
+          MVC   RCRINV,QWACRINV
+          MVC   RCWLME,QWACWLME
+          MVC   RCPKGN,QWACPKGN
+*
+* Populate Commit, Abort and Commit+Abort fields in output record
+          L     R1,QWACCOMM
+          ST    R1,RCCOMM
+          MVC   RCABRT,QWACABRT
+          A     R1,QWACABRT
+          ST    R1,RCCOMMABO
+*
+* Calculate Class 1 elapsed time
+* Note: Includes nested and non-nested time
+          LG    R6,QWACESC
+          STG   R6,RCQWACESC
+*
+          LG    R8,QWACBSC
+          STG   R8,RCQWACBSC
+*
+* If rollup flag on then don't do the subtraction
+          TM    QWACFLGS+1,X'40'
+          BNZ   SHIFTC1ET
+*
+* Not rollup so subtract C1 start from C1 finish
+          SGR   R6,R8
+*
+SHIFTC1ET STG   R6,RCC1TIME
+*
+* Cl 2 non-nested time
+          LG    R6,QWACASC
+          STG   R6,RCC2NNTIME
+* Now do Stored Procedures time and add to total
+*
+          LG    R8,QWACSPEB
+          STG   R8,RCC2SPTIME
+          AGR   R6,R8
+*
+* Now do User-Defined functions time and add to total
+*
+          LG    R8,QWACUDEB
+          STG   R8,RCC2UDFTIME
+          AGR   R6,R8
+*
+          LG    R8,QWACCAST
+          STG   R8,RCC2SPSCHTIME
+          AGR   R6,R8
+*
+          LG    R8,QWACUDST
+          STG   R8,RCC2UDFSCHTIME
+          AGR   R6,R8
+*
+          STG   R6,RCC2TIME              Finally store away all C2 time
+*
+* Calculate Non Class 2 time
+          LG    R6,RCC1TIME
+          SG    R6,RCC2TIME
+          STG   R6,RCNONC2TIME
+*
+* Calculate Class 1 TCB time
+          LG    R6,QWACEJST
+*
+* If rollup flag on then don't do the subtraction
+          TM    QWACFLGS+1,X'40'
+          BNZ   SHIFTC1CP
+*
+* Not rollup so subtract C1 start from C1 finish
+          LG    R8,QWACBJST
+          SGR   R6,R8
+*
+* Now do Stored Procedures C1 TCB time and add to total
+*
+SHIFTC1CP LG    R8,QWACSPCP
+          AGR   R6,R8
+* Now do User-Defined Functions C1 TCB time and add to total
+*
+          LG    R8,QWACUDCP
+          AGR   R6,R8
+*
+          STG   R6,RCC1TCB
+*
+* Adjust class 2 TCB time to make into ms and then store
+* First non-nested time
+          LG    R6,QWACAJST
+          STG   R6,RCC2NNTCB
+* Now do Stored Procedures TCB time and add to total
+*
+          LG    R8,QWACSPTT
+          STG   R8,RCC2SPTCB
+          AGR   R6,R8
+* Now do User-Defined Functions TCB time and add to total
+*
+          LG    R8,QWACUDTT
+          STG   R8,RCC2UDFTCB
+          AGR   R6,R8
+*
+          STG   R6,RCC2TCB               Finally store away all C2 time
+*
+* Calculate Non Class 2 TCB
+          LG    R6,RCC1TCB
+          SG    R6,RCC2TCB
+          STG   R6,RCNONC2TCB
+*
+* Move zIIP Eligible into record
+          MVC   RCZIIPEL,QWACZIIP_ELIGIBLE
+*
+* Move zIIP C1 time into record
+          MVC   RCC1ZIIP,QWACCLS1_zIIP
+*
+* Move zIIP C2 time into record
+          MVC   RCC2ZIIP,QWACCLS2_zIIP
+*
+* Move Sync DB Read time into record
+          MVC   RCSYNCRD,QWACAWTI
+*
+* Move Async DB Write time into record
+          MVC   RCASYNCWR,QWACAWTW
+*
+* Move Async DB Read time into record
+          MVC   RCASYNCRD,QWACAWTR
+*
+* Move Log Write time into record
+          MVC   RCLOGWR,QWACAWLG
+*
+* Move Log Write records and bytes into record
+          MVC   RCLOGRECSWR,QWACLRN
+          MVC   RCLOGBYTESWR,QWACLRAB
+*
+* Move Log Write wait events into record
+          MVC   RCLOGWREVT,QWACARLG
+*
+* Move Local Lock time into record
+          MVC   RCLOCALLOCK,QWACAWTL
+*
+* Move Global Lock time into record
+          MVC   RCGLOBALLOCK,QWACAWTJ
+*
+          DROP  R10
+*
+* QWAX Section
+          SR    R10,R10
+          LH    R10,QWA01RCN
+          LTR   R10,R10
+          BZ    AFTER_QWAX
+*
+          LR    R10,R3
+          A     R10,QWA01RCO             CALCULATE QWAX SECT ADDR
+*
+          USING QWAX,R10
+*
+          MVC   RCOTSE,QWAXOTSE
+*
+* Logging
+          MVC   RCALOG,QWAXALOG
+          MVC   RCAWAR,QWAXAWAR
+          MVC   RCALCT,QWAXALCT
+          MVC   RCANAR,QWAXANAR
+*
+          DROP  R10
+*
+AFTER_QWAX EQU *
+          LR    R10,R3
+          A     R10,QWA01R5O             CALCULATE QLAC SECT ADDR
+* 2 byte adjustment seems to be required
+          A     R10,=F'2'
+          USING QLAC,R10
+*
+          MVC   RCQLAC,=C'QLACMGLP'
+          MVC   RCLOCN,QLACLOCN
+          MVC   RCSQLS,QLACSQLS
+          MVC   RCSQLR,QLACSQLR
+          MVC   RCROWS,QLACROWS
+          MVC   RCROWR,QLACROWR
+          MVC   RCBYTS,QLACBYTS
+          MVC   RCBYTR,QLACBYTR
+          MVC   RCCNVS,QLACCNVS
+          MVC   RCCNVR,QLACCNVR
+          MVC   RCMSGS,QLACMSGS
+          MVC   RCMSGR,QLACMSGR
+          MVC   RCCOMS,QLACCOMS
+          MVC   RCCOMR,QLACCOMR
+          MVC   RCABRS,QLACABRS
+          MVC   RCABRR,QLACABRR
+          MVC   RCBTBF,QLACBTBF
+          MVC   RCBRBF,QLACBRBF
+          MVC   RCMDWT,QLACMDWT
+          DROP  R10
+*
+          LR    R10,R3
+          A     R10,QWA01R2O             CALCULATE QXST SECT ADDR
+          USING QXST,R10
+*
+          MVC   RCEYE,QXEYE
+          MVC   RCQXST,=C'QXSTMGLP'
+          MVC   RCSELECT,QXSELECT
+          MVC   RCINSRT,QXINSRT
+          MVC   RCUPDTE,QXUPDTE
+          MVC   RCDELET,QXDELET
+          MVC   RCDESC,QXDESC
+          MVC   RCPREP,QXPREP
+          MVC   RCOPEN,QXOPEN
+          MVC   RCCLOSE,QXCLOSE
+          MVC   RCFETCH,QXFETCH
+          MVC   RCCALLSP,QXCALL
+          MVC   RCCALLUDF,QXCAUD
+          MVC   RCSTFND,QXSTFND
+          MVC   RCSTNFND,QXSTNFND
+          MVC   RCSTIPRP,QXSTIPRP
+          MVC   RCSTNPRP,QXSTNPRP
+          MVC   RCSTDEXP,QXSTDEXP
+          MVC   RCSTDINV,QXSTDINV
+          DROP  R10
+*
+* Calculate new record length
+CALC_3_RLEN LA  R9,RC_LENGTH
+          STH   R9,RCRLEN
+*
+* Return record from output area rather than input record
+          L     R1,OUT_BUFFER
+          B     CHANGED
+***********************************************************************
+*                                                                     *
+*        IFCID 239 code                                               *
+*                                                                     *
+***********************************************************************
+          USING QWHS,R10
+* Move IFCID (in this case 239) to output record
+* R10 points to QWHS, R5 to Output record
+          DROP  R5
+          USING I239,R5
+*
+IFCID239  XC 0(200,R5),0(R5)
+          XC 200(200,R5),200(R5)
+          XC 400(200,R5),400(R5)
+          XC 600(200,R5),600(R5)
+          XC 800(200,R5),800(R5)
+          XC 1000(200,R5),1000(R5)
+          XC 1200(200,R5),1200(R5)
+          XC 1400(200,R5),1400(R5)
+          XC 1600(200,R5),1600(R5)
+*
+* SMFID
+          L     R6,14(R3)
+          ST    R6,I239SMFID
+*
+* DB2 SSID
+          L     R6,18(R3)
+          ST    R6,I239SSID
+*
+          LH    R6,QWHSIID
+          STH   R6,I239IFCID
+*
+* Move QWHS eyecatcher into output record
+          MVC   I239QWHS,=C'QWHSMGLP'
+*
+* Move LWID into output record
+          MVC   I239LWID,QWHSLWID
+*
+* Move QWHSLOCN and plan and corr into output record
+          MVC   I239QWHSLOCN,QWHSLOCN
+*
+          SR    R6,R6
+          LH    R6,QWHSLEN
+          AR    R10,R6                  CORRELATION SECTION FOLLOWS
+          DROP  R10
+          USING QWHC,R10
+*
+          MVC   I239CORR,QWHCCV
+          MVC   I239CONN,QWHCCN
+          MVC   I239PLAN,QWHCPLAN
+*
+* Reject non-DDF stuff, storing QWHCATYP in both DUW and RUW cases
+          L     R6,QWHCATYP
+          C     R6,=F'00000007'
+          BE    IS_DDF239
+*
+          C     R6,=F'00000008'        Is not DUW so try RUW
+          BE    IS_DDF239
+*
+          B     REJECT
+*
+IS_DDF239 ST    R6,I239ATYP
+*
+*
+          LA    R11,SM101END
+          USING QWA1,R11
+*         USING SM101,R3
+          LR    R10,R3
+*
+          LH    R7,QWA11R2N
+          STH   R7,I239SECTN
+*
+          LH    R6,QWA11R2L
+          STH   R6,I239SECTL
+*
+          A     R10,QWA11R2O             CALCULATE QPAC SECT ADDR
+*
+* Process 0th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN0
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG0
+*
+          MVC   I239LOCN0,QPACLOCN
+          MVC   I239COLN0,QPACCOLN
+          MVC   I239PKID0,QPACPKID
+          MVC   I239AANM0,QPACAANM
+          MVC   I239ASCH0,QPACASCH
+          MVC   I239CPU0,QPACTJST
+          MVC   I239ZIIP0,QPACCLS7_zIIP
+          MVC   I239ET0,QPACSCT
+          MVC   I239SPROCS0,QPACSPNS
+          MVC   I239UDFS0,QPACUDNU
+          MVC   I239IDAA0,QPACAACW
+*
+          CH    R7,=H'0002'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 1st section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN1
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG1
+*
+          MVC   I239LOCN1,QPACLOCN
+          MVC   I239COLN1,QPACCOLN
+          MVC   I239PKID1,QPACPKID
+          MVC   I239AANM1,QPACAANM
+          MVC   I239ASCH1,QPACASCH
+          MVC   I239CPU1,QPACTJST
+          MVC   I239ZIIP1,QPACCLS7_zIIP
+          MVC   I239ET1,QPACSCT
+          MVC   I239SPROCS1,QPACSPNS
+          MVC   I239UDFS1,QPACUDNU
+          MVC   I239IDAA1,QPACAACW
+*
+          CH    R7,=H'0003'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 2nd section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN2
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG2
+*
+          MVC   I239LOCN2,QPACLOCN
+          MVC   I239COLN2,QPACCOLN
+          MVC   I239PKID2,QPACPKID
+          MVC   I239AANM2,QPACAANM
+          MVC   I239ASCH2,QPACASCH
+          MVC   I239CPU2,QPACTJST
+          MVC   I239ZIIP2,QPACCLS7_zIIP
+          MVC   I239ET2,QPACSCT
+          MVC   I239SPROCS2,QPACSPNS
+          MVC   I239UDFS2,QPACUDNU
+          MVC   I239IDAA2,QPACAACW
+*
+          CH    R7,=H'0004'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 3rd section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN3
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG3
+*
+          MVC   I239LOCN3,QPACLOCN
+          MVC   I239COLN3,QPACCOLN
+          MVC   I239PKID3,QPACPKID
+          MVC   I239AANM3,QPACAANM
+          MVC   I239ASCH3,QPACASCH
+          MVC   I239CPU3,QPACTJST
+          MVC   I239ZIIP3,QPACCLS7_zIIP
+          MVC   I239ET3,QPACSCT
+          MVC   I239SPROCS3,QPACSPNS
+          MVC   I239UDFS3,QPACUDNU
+          MVC   I239IDAA3,QPACAACW
+*
+          CH    R7,=H'0005'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 4th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN4
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG4
+*
+          MVC   I239LOCN4,QPACLOCN
+          MVC   I239COLN4,QPACCOLN
+          MVC   I239PKID4,QPACPKID
+          MVC   I239AANM4,QPACAANM
+          MVC   I239ASCH4,QPACASCH
+          MVC   I239CPU4,QPACTJST
+          MVC   I239ZIIP4,QPACCLS7_zIIP
+          MVC   I239ET4,QPACSCT
+          MVC   I239SPROCS4,QPACSPNS
+          MVC   I239UDFS4,QPACUDNU
+          MVC   I239IDAA4,QPACAACW
+*
+          CH    R7,=H'0006'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 5th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN5
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG5
+*
+          MVC   I239LOCN5,QPACLOCN
+          MVC   I239COLN5,QPACCOLN
+          MVC   I239PKID5,QPACPKID
+          MVC   I239AANM5,QPACAANM
+          MVC   I239ASCH5,QPACASCH
+          MVC   I239CPU5,QPACTJST
+          MVC   I239ZIIP5,QPACCLS7_zIIP
+          MVC   I239ET5,QPACSCT
+          MVC   I239SPROCS5,QPACSPNS
+          MVC   I239UDFS5,QPACUDNU
+          MVC   I239IDAA5,QPACAACW
+*
+          CH    R7,=H'0007'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 6th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN6
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG6
+*
+          MVC   I239LOCN6,QPACLOCN
+          MVC   I239COLN6,QPACCOLN
+          MVC   I239PKID6,QPACPKID
+          MVC   I239AANM6,QPACAANM
+          MVC   I239ASCH6,QPACASCH
+          MVC   I239CPU6,QPACTJST
+          MVC   I239ZIIP6,QPACCLS7_zIIP
+          MVC   I239ET6,QPACSCT
+          MVC   I239SPROCS6,QPACSPNS
+          MVC   I239UDFS6,QPACUDNU
+          MVC   I239IDAA6,QPACAACW
+*
+          CH    R7,=H'0008'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 7th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN7
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG7
+*
+          MVC   I239LOCN7,QPACLOCN
+          MVC   I239COLN7,QPACCOLN
+          MVC   I239PKID7,QPACPKID
+          MVC   I239AANM7,QPACAANM
+          MVC   I239ASCH7,QPACASCH
+          MVC   I239CPU7,QPACTJST
+          MVC   I239ZIIP7,QPACCLS7_zIIP
+          MVC   I239ET7,QPACSCT
+          MVC   I239SPROCS7,QPACSPNS
+          MVC   I239UDFS7,QPACUDNU
+          MVC   I239IDAA7,QPACAACW
+*
+          CH    R7,=H'0009'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 8th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN8
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG8
+*
+          MVC   I239LOCN8,QPACLOCN
+          MVC   I239COLN8,QPACCOLN
+          MVC   I239PKID8,QPACPKID
+          MVC   I239AANM8,QPACAANM
+          MVC   I239ASCH8,QPACASCH
+          MVC   I239CPU8,QPACTJST
+          MVC   I239ZIIP8,QPACCLS7_zIIP
+          MVC   I239ET8,QPACSCT
+          MVC   I239SPROCS8,QPACSPNS
+          MVC   I239UDFS8,QPACUDNU
+          MVC   I239IDAA8,QPACAACW
+*
+          CH    R7,=H'0010'
+          BL    AFTER_QPACS
+*
+          AR    R10,R8
+*
+* Process 9th section
+* Pick up length of this section
+          SR    R8,R8
+          LH    R8,0(,R10)
+*         Move past two-byte length field
+          LA    R10,2(,R10)
+*
+          DROP  R10
+          USING QPAC,R10
+*
+          LH    R6,QPACRECN
+          STH   R6,I239RECN9
+*
+          LH    R6,QPACAAFG
+          STH   R6,I239AAFG9
+*
+          MVC   I239LOCN9,QPACLOCN
+          MVC   I239COLN9,QPACCOLN
+          MVC   I239PKID9,QPACPKID
+          MVC   I239AANM9,QPACAANM
+          MVC   I239ASCH9,QPACASCH
+          MVC   I239CPU9,QPACTJST
+          MVC   I239ZIIP9,QPACCLS7_zIIP
+          MVC   I239ET9,QPACSCT
+          MVC   I239SPROCS9,QPACSPNS
+          MVC   I239UDFS9,QPACUDNU
+          MVC   I239IDAA9,QPACAACW
+*
+AFTER_QPACS EQU *
+* Calculate new record length
+CALC_I239_RLEN LA    R9,I239_LENGTH
+          STH   R9,I239RLEN
+*
+* Return record from output area rather than input record
+          L     R1,OUT_BUFFER
+          B     CHANGED
+*
+*
+* Literal pool here
+*
+          LTORG
+*
+***********************************************************************
+*                                                                     *
+*        ASSEMBLY DATE EYECATCHER IN MODULE                           *
+*                                                                     *
+***********************************************************************
+ICATCHER  DC    C'ASSEMBLED: '
+          DC    C'&amp;SYSDATC '
+          DC    C'&amp;SYSTIME'
+*
+***********************************************************************
+*                                                                     *
+*        BIG DATA AREAS ARE DEFINED HERE AND ADDRESSED WITH ACONS     *
+*                                                                     *
+***********************************************************************
+RECORD_POINTER DS F                 POINTER TO DATA RECORD
+FIRST_RECORD_FLAG DC X'00000001'    FIRST RECORD FLAG
+REGISTER_SAVE_AREA DS 18F
+*
+OUT_BUFFER DS   F                   OUTPUT BUFFER ADDRESS
+TEMP_STOR  DS   F                   TEMPORARY WORKING AREA
+*
+* DSECT TO MAP PLAN INFO TEMP RECORD
+TEMP     DSECT
+TEMPPACK   DS   0PL8           Temporary storage for packed time
+           DS   CL6
+TEMPPACK2  DS   CL2
+TS_LENGTH  EQU  *-TEMPPACK
+****
+**** IGNORE DFSORT POSITIONS
+****
+*                              Position for DFSORT
+RC       DSECT
+*                              -------------------
+RCRLEN     DS   H              @1  RDW
+RCBDW      DS   H              @3
+RCTIME     DS   F              @5  SMF Time
+RCDATE     DS   F              @9  SMF Date
+RCHOUR     DS   H              @13 From SMF Time
+RCMIN      DS   H              @15 From SMF Time
+RCSEC      DS   H              @17 From SMF Time
+RCHUN      DS   H              @19 From SMF Time
+RCSMFID    DS   CL4            @21 From SMF Header
+RCSSID     DS   CL4            @25 From SMF Header
+RCAID      DS   CL8            @29 QWHCAID
+RCCV       DS   0CL12          @37
+FIRST8     DS   0CL8             @37
+FIRST4     DS   CL4                @37
+SECOND4    DS   CL4                @41
+THIRD4     DS   CL4              @45
+RCCN       DS   CL8            @49
+RCPLAN     DS   CL8            @57
+RCOPID     DS   CL8            @65
+RCATYP     DS   F              @73  QWHCATYP
+RCTOKN     DS   CL22           @77
+RCEUID     DS   CL16           @99
+RCEUTX     DS   CL32           @115
+RCEUWN     DS   CL18           @147
+RCRINV     DS   F              @165
+RCWLME     DS   CL8            @169
+*
+RCQMDA     DS   CL8
+RCASLN     DS   XL1            @185
+           DS   XL1
+RCIFCID    DS   H              @187
+RCAINF     DS   CL255          @189 QMDAAINF: Has many embedded fields
+           DS   D              GUARD DWRD - first byte gets clobbered
+RCQWHS     DS   CL8
+RCLWID     DS   CL24           @465 QWHSLWID
+           DS   D              GUARD DWRD
+*
+RCQLAC     DS   CL8
+RCLOCN     DS   CL16
+RCSQLS     DS   D              @521  &lt;-  +2
+RCSQLR     DS   D              @529
+RCROWS     DS   D              @537
+RCROWR     DS   D              @545
+RCBYTS     DS   D              @553
+RCBYTR     DS   D              @561
+RCCNVS     DS   D              @569
+RCCNVR     DS   D              @577
+RCMSGS     DS   D              @585
+RCMSGR     DS   D              @593
+RCCOMS     DS   D              @601
+RCCOMR     DS   D              @609
+RCABRS     DS   D              @617
+RCABRR     DS   D              @625
+RCBTBF     DS   D              @633
+RCBRBF     DS   D              @641
+RCPKGN     DS   H              @649
+* SKIP,2 For Fullword Alignment
+RCCOMM      DS   F             @653 Y Checked RCCOMM + RCABRT =
+RCABRT      DS   F             @657     RCCOMMABO
+* SKIP,4 for doubleword alignment
+*
+RCEYE      DS   CL4
+RCQXST     DS   CL8
+*
+RCSELECT    DS   D             @673
+RCINSRT     DS   D             @681
+RCUPDTE     DS   D             @689
+RCDELET     DS   D             @697
+RCDESC      DS   D             @705
+RCPREP      DS   D             @713
+RCOPEN      DS   D             @721
+RCCLOSE     DS   D             @729
+RCFETCH     DS   D             @737
+RCCALLSP    DS   D             @745
+RCCALLUDF   DS   D             @753
+*
+RCQWAC      DS CL8
+*
+RCC1TCB     DS   D             @769
+RCC2NNTCB   DS   D             @777
+RCC1TIME    DS   D             @785
+RCC2TIME    DS   D             @793
+RCC2NNTIME  DS   D             @801
+RCC2SPTIME  DS   D             @809
+RCC2UDFTIME DS   D             @817
+RCC2SPSCHTIME DS   D           @825
+RCC2UDFSCHTIME DS   D          @833
+RCIPADDR    DS   CL16          @841
+RCSTFND     DS   D             @857
+RCSTNFND    DS   D             @865
+RCSTIPRP    DS   D             @873
+RCSTNPRP    DS   D             @881
+RCSTDEXP    DS   D             @889
+RCSTDINV    DS   D             @897
+RCC1ZIIP    DS   D             @905
+RCC2ZIIP    DS   D             @913
+RCZIIPEL    DS   D             @921
+RCC2TCB     DS   D             @929
+RCC2SPTCB   DS   D             @937
+RCC2UDFTCB  DS   D             @945
+RCQWACBSC   DS   D             @953
+RCQWACESC   DS   D             @961
+RCNONC2TIME DS   D             @969
+RCNONC2TCB  DS   D             @977
+RCQWHSLOCN  DS   CL16          @985
+RCQWHDSVNM  DS   CL16          @1001
+RCCOMMABO   DS   F             @1017
+* SKIP 4
+RCMDWT      DS   D             @1025
+RCSYNCRD    DS   D             @1033
+RCASYNCWR   DS   D             @1041
+RCASYNCRD   DS   D             @1049
+RCLOCALLOCK DS   D             @1057
+RCGLOBALLOCK DS  D             @1065
+*
+* Added 12 October 2020
+RCLOGBYTESWR DS  D             @1073
+RCLOGRECSWR  DS  F             @1081
+RCLOGWREVT   DS  F             @1085
+RCQWAX       DS  D             @1089
+RCOTSE       DS  D             @1097
+RCLOGWR      DS  D             @1105
+RCALOG       DS  D             @1113
+RCAWAR       DS  D             @1121
+RCALCT       DS  F             @1129
+RCANAR       DS  F             @1133
+*
+RCEND      EQU  *              @1137
+*
+RC_LENGTH  EQU  RCEND-RCRLEN
+*
+* IFCID 239 VERSION OF THE RECORD
+*
+I239     DSECT
+I239RLEN   DS   H              @1  RDW
+I239BDW    DS   H              @3
+I239SMFID     DS  CL4
+I239SSID      DS  CL4
+I239QWHS      DS  CL8
+I239LWID      DS CL24
+I239QWHSLOCN  DS CL16
+I239ATYP      DS   F
+I239SECTN     DS   H
+I239SECTL     DS   H
+I239CORR      DS CL12
+I239CONN      DS CL8
+I239PLAN      DS CL8
+              DS   CL90
+*
+I239IFCID  DS   H              Same as RCIFCID
+*
+I239RECN0     DS   H
+I239LOCN0     DS   CL16
+I239COLN0     DS   CL18
+I239PKID0     DS   CL18
+I239AAFG0     DS   H
+I239AANM0     DS   CL18
+I239ASCH0     DS   CL8
+I239CPU0      DS   D
+I239ZIIP0     DS   D
+I239ET0       DS   D
+I239SPROCS0   DS   F
+I239UDFS0     DS   F
+I239IDAA0     DS   D
+*
+I239RECN1     DS   H
+I239LOCN1     DS   CL16
+I239COLN1     DS   CL18
+I239PKID1     DS   CL18
+I239AAFG1     DS   H
+I239AANM1     DS   CL18
+I239ASCH1     DS   CL8
+I239CPU1      DS   D
+I239ZIIP1     DS   D
+I239ET1       DS   D
+I239SPROCS1   DS   F
+I239UDFS1     DS   F
+I239IDAA1     DS   D
+*
+I239RECN2     DS   H
+I239LOCN2     DS   CL16
+I239COLN2     DS   CL18
+I239PKID2     DS   CL18
+I239AAFG2     DS   H
+I239AANM2     DS   CL18
+I239ASCH2     DS   CL8
+I239CPU2      DS   D
+I239ZIIP2     DS   D
+I239ET2       DS   D
+I239SPROCS2   DS   F
+I239UDFS2     DS   F
+I239IDAA2     DS   D
+*
+I239RECN3     DS   H
+I239LOCN3     DS   CL16
+I239COLN3     DS   CL18
+I239PKID3     DS   CL18
+I239AAFG3     DS   H
+I239AANM3     DS   CL18
+I239ASCH3     DS   CL8
+I239CPU3      DS   D
+I239ZIIP3     DS   D
+I239ET3       DS   D
+I239SPROCS3   DS   F
+I239UDFS3     DS   F
+I239IDAA3     DS   D
+*
+I239RECN4     DS   H
+I239LOCN4     DS   CL16
+I239COLN4     DS   CL18
+I239PKID4     DS   CL18
+I239AAFG4     DS   H
+I239AANM4     DS   CL18
+I239ASCH4     DS   CL8
+I239CPU4      DS   D
+I239ZIIP4     DS   D
+I239ET4       DS   D
+I239SPROCS4   DS   F
+I239UDFS4     DS   F
+I239IDAA4     DS   D
+*
+I239RECN5     DS   H
+I239LOCN5     DS   CL16
+I239COLN5     DS   CL18
+I239PKID5     DS   CL18
+I239AAFG5     DS   H
+I239AANM5     DS   CL18
+I239ASCH5     DS   CL8
+I239CPU5      DS   D
+I239ZIIP5     DS   D
+I239ET5       DS   D
+I239SPROCS5   DS   F
+I239UDFS5     DS   F
+I239IDAA5     DS   D
+*
+I239RECN6     DS   H
+I239LOCN6     DS   CL16
+I239COLN6     DS   CL18
+I239PKID6     DS   CL18
+I239AAFG6     DS   H
+I239AANM6     DS   CL18
+I239ASCH6     DS   CL8
+I239CPU6      DS   D
+I239ZIIP6     DS   D
+I239ET6       DS   D
+I239SPROCS6   DS   F
+I239UDFS6     DS   F
+I239IDAA6     DS   D
+*
+I239RECN7     DS   H
+I239LOCN7     DS   CL16
+I239COLN7     DS   CL18
+I239PKID7     DS   CL18
+I239AAFG7     DS   H
+I239AANM7     DS   CL18
+I239ASCH7     DS   CL8
+I239CPU7      DS   D
+I239ZIIP7     DS   D
+I239ET7       DS   D
+I239SPROCS7   DS   F
+I239UDFS7     DS   F
+I239IDAA7     DS   D
+*
+I239RECN8     DS   H
+I239LOCN8     DS   CL16
+I239COLN8     DS   CL18
+I239PKID8     DS   CL18
+I239AAFG8     DS   H
+I239AANM8     DS   CL18
+I239ASCH8     DS   CL8
+I239CPU8      DS   D
+I239ZIIP8     DS   D
+I239ET8       DS   D
+I239SPROCS8   DS   F
+I239UDFS8     DS   F
+I239IDAA8     DS   D
+*
+I239RECN9     DS   H
+I239LOCN9     DS   CL16
+I239COLN9     DS   CL18
+I239PKID9     DS   CL18
+I239AAFG9     DS   H
+I239AANM9     DS   CL18
+I239ASCH9     DS   CL8
+I239CPU9      DS   D
+I239ZIIP9     DS   D
+I239ET9       DS   D
+I239SPROCS9   DS   F
+I239UDFS9     DS   F
+I239IDAA9     DS   D
+*
+I239END    EQU  *
+*
+I239_LENGTH  EQU  I239END-I239RLEN
+*
+           DSNDQWAS DSECT=YES,SUBTYPE=0
+           DSNDQWA1 DSECT=YES
+           DSNDQPAC DSECT=YES
+           END   E15DDFID</inlineTemplate>
+            <submitAs maxRc="4">JCL</submitAs>
+            <maxLrecl>80</maxLrecl>
+        </template>
+    </step>
+</workflow>
