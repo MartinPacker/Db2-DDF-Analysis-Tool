@@ -8,7 +8,8 @@
 //         DSN=<HLQ>.<QUAL2>.DDF.FLAT.CLIOTHER                                  
 //         DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.DDF.FLAT.MFDB2DDF                                  
-//REPORT   DD SYSOUT=<SYSOUT>                                                   
+//REPORT   DD DISP=SHR, 
+//         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(BYMINUTE)
 //SYMNAMES DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
 //         DD *                                                                 
