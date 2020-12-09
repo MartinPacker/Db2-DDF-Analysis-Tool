@@ -18,8 +18,11 @@ This initial release consists of the following JCL programs:
 * ASMEXIT - to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
 * BUILDDB - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
 * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
+* BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
+
+There is also a z/OSMF workflow (ASMEXIT.xml) to assemble and linkedit the E15 exit used in the database build process.
 
 ## Installation
 
@@ -32,7 +35,7 @@ To install the code:
 `<SDSNMACS>` needs to be changed to point at your Db2 installation macro library.
 1. Extract a small set of SMF 101 data and point at it (via SORTIN) in an edited version of the BUILDDB job.
 1. Create a reporting data set, as outlined in [Reporting](#reporting).
-1. Tailor and run the SSIDCORR sample reporting program.
+1. Tailor and run the SSIDCORR sample reporting program - to verify it all works correctly.
 
 All the jobs should return RC=0. The test with the small set of SMF 101 data should suffice for Installation Verification.
 
@@ -86,22 +89,29 @@ If you follow the above naming convention sample reporting jobs should be able t
 **Note:** Because this is RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
 
+### Sample Reporting Job SSIDCORR
 
-### Sample Reporting Program SSIDCORR
-
-This is a two step SORT program, showing many of the most useful techniques.
+This is a two step SORT job, showing many of the most useful techniques.
 It comprises two steps:
 
 1. SUMSSIDS - Producing a list of Db2 subsystem IDs
 1. SUMCORRS - Producting a list of Db2 correlation IDs
 
-The output from this will be two Comma-Separated-Value members of the reporting data set - SUMSSIDS and SUMCORRS.
+The output from this will be two Comma-Separated-Value (CSV) members of the reporting data set - SUMSSIDS and SUMCORRS.
 A reasonable step would be to download these and import them into a spreadsheet, where you could sort them on a number of columns and report on them.
 (This repository doesn't currently contain any workstation code.)
 
 One technique of note is to concatenate further symbols to the SYMNAMES DD.
 The symbols beginning with `_` are as a result of the INREC statement.
 To make this work you need to have a `POSITION,1` statement before these symbols.
+
+### Sample Reporting Job BYMINUTE
+
+This is a single-step job, showing how you can report down at the one minute level. Arbitrary / short time granularity is one of the key benefits of Db2 DDF Analysis Tool.
+
+It creates a CSV member of the reporting data set - BYMINUTE.
+
+One interesting feature is that it reports on SQL statements **sent** separately from SQL statements **received**. So you can see to what degree the Db2 subsystem acts as a client, and to what extent it acts as a server.
 
 ## Tailoring
 
@@ -112,3 +122,8 @@ You will need to globally edit the following variables to suit your environment:
 * **&lt;SYSOUT&gt;** - SYSOUT specification e.g. `K,HOLD=YES`.
 * **&lt;SDSNMACS&gt;** - Db2 Macro Library e.g. `DB2.V12.SDSNMACS`.
 * **&lt;UNIT&gt;** - Disk unit e.g. `SYSDA`.
+
+For some reporting jobs you will need to edit two variables to tailor the report to a specific subsystem:
+
+* **&lt;SMFID&gt;** - System SMFID e.g. `SYSA`.
+* **&lt;SSID&gt;** - Db2 Subsystem Name e.g. `DB2P`.
