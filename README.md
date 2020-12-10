@@ -22,7 +22,10 @@ This initial release consists of the following JCL programs:
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
-There is also a z/OSMF workflow (ASMEXIT.xml) to assemble and linkedit the E15 exit used in the database build process.
+There are also z/OSMF workflows:
+
+* ASMEXIT.xml - to assemble and linkedit the E15 exit used in the database build process.
+* BUILDDB.xml - to read the SMF 101 Db2 Accounting Trace records and build the database.
 
 ## Installation
 
@@ -119,8 +122,9 @@ You will need to globally edit the following variables to suit your environment:
 
 * **&lt;HLQ&gt;** - High Level Qualifier e.g. `PACKER`.
 * **&lt;QUAL2&gt;** - Second Level Qualifier e.g. `CLIENTA`. I would not make this more than 1 level as some of the data sets will run out of qualifiers.
-* **&lt;SYSOUT&gt;** - SYSOUT specification e.g. `K,HOLD=YES`.
 * **&lt;SDSNMACS&gt;** - Db2 Macro Library e.g. `DB2.V12.SDSNMACS`.
+* **&lt;SMF-Input&gt;** - Input data set with the SMF 101 records in e.g. `PACKER.TEST.SMF.DB2ACCT`.
+* **&lt;SYSOUT&gt;** - SYSOUT specification e.g. `K,HOLD=YES`.
 * **&lt;UNIT&gt;** - Disk unit e.g. `SYSDA`.
 
 For some reporting jobs you will need to edit two variables to tailor the report to a specific subsystem:
