@@ -31,7 +31,7 @@
 //         DSN=<HLQ>.<QUAL2>.LOAD                                               
 //*                                                                             
 //SORTIN   DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.SMF.DB2ACCT.HOURS2                                 
+//         DSN=<SMF-Input>                                 
 //*                                                                             
 //CLSRVDDF DD DSN=<HLQ>.<QUAL2>.DDF.FLAT.CLSRVDDF,                              
 //         DISP=(NEW,CATLG),                                                    
