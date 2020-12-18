@@ -16,56 +16,56 @@ QWHCTRRS,X'0000000C'            RRSAF Attach
 * QWAC section to contain one. So 0 means this an IFCID 239 record. For         
 * IFCID 3 one of the values should apply.                                       
 IFCID239,X'00000000'         IFCID 239 so no QWACRINV                           
-QWACRACC,X'00000001'         /*ACCUMULATING DATA BY END USER FOR DDF */ 07290000
-*                            /*OR RRSAF AND THRESHOLD REACHED FOR #  */ 07300000
-*                            /*END USER OCCURRENCES. THIS IS ALSO    */ 07310000
-*                            /*THE QWACRINV VALUE FOR IFI 147/148    */ 07320000
-*                            /*RECORDS THAT REPRESENT DDF/RRSAF      */ 07330000
-*                            /*ROLLUP DATA.                          */ 07340000
-QWACRSTG,X'00000002'         /*ACCUMULATING DATA BY END USER FOR DDF */ 07350000
-*                            /*OR RRSAF AND INTERNAL DB2 STORAGE     */ 07360000
-*                            /*THRESHOLD HAS BEEN REACHED            */ 07370000
-QWACRSTL,X'00000003'         /*ACCUMULATING DATA BY END USER FOR DDF */ 07380000
-*                            /*OR RRSAF AND ACCUMULATED DATA HAS     */ 07390000
-*                            /*EXCEEDED THE STALENESS THRESHOLD      */ 07400000
-QWACRIFI,X'00000004'         /*IFI READS REQUEST FOR IFCID 147 OR    */ 07410000
-*                            /*148                                   */ 07420000
-QWACRSUS,X'00000006'         /*SAME USER RESIGN-ON WITH SAME AUTHID  */ 07430000
-QWACRNUS,X'00000008'         /*NEW USER - THE AUTHORIZATION ID       */ 07440000
-*                            /*CHANGED.                              */ 07450000
-QWACRINA,X'0000000A'         /*DDF THREAD IS BECOMING INACTIVE       */ 07460000
-QWACRIN2,X'0000000B'         /*DDF TYPE 2 INACT IS BECOMING INACTIVE */ 07470000
-QWACRDEA,X'0000000C'         /*DEALLOCATION - NORMAL PROGRAM         */ 07480000
-*                            /*TERMINATION                           */ 07490000
-QWACRAAC,X'0000000E'         /*COMMIT - RRSAF THREAD SPECIFIED       */ 07500000
-*                            /*ACCOUNTING INTERVAL = COMMIT          */ 07510000
-*/********************************************************************/ 07520000
-*/* THE FOLLOWING CONSTANTS INDICATE WHY ACCOUNTING WAS CALLED,         07530000
-*   HOWEVER, THE ACCOUNTING RECORD IS WRITTEN AT DEALLOCATION        */ 07540000
-*/********************************************************************/ 07550000
-*                                                                       07560000
-QWACEOTN,X'00000010'         /*END OF TASK - APPLICATION PROGRAM     */ 07570000
-*                            /*TERMINATED - NORMAL                   */ 07580000
-QWACEOTA,X'00000014'         /*END OF TASK - APPLICATION PROGRAM     */ 07590000
-*                            /*ABEND SITUATION - ABNORMAL            */ 07600000
-QWACEOMA,X'00000018'         /*END OF MEMORY - ABNORMAL TERMINATION  */ 07610000
-QWACRESI,X'0000001C'         /*RESOLVE INDOUBT - ABNORMAL            */ 07620000
-QWACCANF,X'00000020'         /*CANCEL FORCE - STOP FORCE COMMAND     */ 07630000
-*                            /*TERMINATED - ABNORMAL                 */ 07640000
-*/********************************************************************/ 07650000
-*/* THE FOLLOWING CONSTANTS INDICATE WHY ACCOUNTING WAS CALLED,         07660000
-*    AND THE ACCOUNTING RECORD IS WRITTEN NOW WITH THE WORK UNIT        07670000
-*    HAVING GONE  INDOUBT                                            */ 07680000
-*/********************************************************************/ 07690000
-QWACETIN,X'00000028'         /*END OF TASK - APPLICATION PROGRAM     */ 07700000
-*                            /*TERMINATED - NORMAL                   */ 07710000
-QWACETIA,X'0000002C'         /*END OF TASK - APPLICATION PROGRAM     */ 07720000
-*                            /*ABEND SITUATION - ABNORMAL            */ 07730000
-QWACEMIA,X'00000030'         /*END OF MEMORY - ABNORMAL TERMINATION  */ 07740000
-*                            /*ABNORMAL                              */ 07750000
-QWACCNFI,X'00000038'         /*CANCEL FORCE - STOP FORCE COMMAND     */ 07760000
-*                            /*ABNORMAL                              */ 07770000
-*                                                                       07780000
+QWACRACC,X'00000001'         /*ACCUMULATING DATA BY END USER FOR DDF */
+*                            /*OR RRSAF AND THRESHOLD REACHED FOR #  */
+*                            /*END USER OCCURRENCES. THIS IS ALSO    */
+*                            /*THE QWACRINV VALUE FOR IFI 147/148    */
+*                            /*RECORDS THAT REPRESENT DDF/RRSAF      */
+*                            /*ROLLUP DATA.                          */
+QWACRSTG,X'00000002'         /*ACCUMULATING DATA BY END USER FOR DDF */
+*                            /*OR RRSAF AND INTERNAL DB2 STORAGE     */
+*                            /*THRESHOLD HAS BEEN REACHED            */
+QWACRSTL,X'00000003'         /*ACCUMULATING DATA BY END USER FOR DDF */
+*                            /*OR RRSAF AND ACCUMULATED DATA HAS     */
+*                            /*EXCEEDED THE STALENESS THRESHOLD      */
+QWACRIFI,X'00000004'         /*IFI READS REQUEST FOR IFCID 147 OR    */
+*                            /*148                                   */
+QWACRSUS,X'00000006'         /*SAME USER RESIGN-ON WITH SAME AUTHID  */
+QWACRNUS,X'00000008'         /*NEW USER - THE AUTHORIZATION ID       */
+*                            /*CHANGED.                              */
+QWACRINA,X'0000000A'         /*DDF THREAD IS BECOMING INACTIVE       */
+QWACRIN2,X'0000000B'         /*DDF TYPE 2 INACT IS BECOMING INACTIVE */
+QWACRDEA,X'0000000C'         /*DEALLOCATION - NORMAL PROGRAM         */
+*                            /*TERMINATION                           */
+QWACRAAC,X'0000000E'         /*COMMIT - RRSAF THREAD SPECIFIED       */
+*                            /*ACCOUNTING INTERVAL = COMMIT          */
+*/********************************************************************/
+*/* THE FOLLOWING CONSTANTS INDICATE WHY ACCOUNTING WAS CALLED,        
+*   HOWEVER, THE ACCOUNTING RECORD IS WRITTEN AT DEALLOCATION        */
+*/********************************************************************/
+*                                                                      
+QWACEOTN,X'00000010'         /*END OF TASK - APPLICATION PROGRAM     */
+*                            /*TERMINATED - NORMAL                   */
+QWACEOTA,X'00000014'         /*END OF TASK - APPLICATION PROGRAM     */
+*                            /*ABEND SITUATION - ABNORMAL            */
+QWACEOMA,X'00000018'         /*END OF MEMORY - ABNORMAL TERMINATION  */
+QWACRESI,X'0000001C'         /*RESOLVE INDOUBT - ABNORMAL            */
+QWACCANF,X'00000020'         /*CANCEL FORCE - STOP FORCE COMMAND     */
+*                            /*TERMINATED - ABNORMAL                 */
+*/********************************************************************/
+*/* THE FOLLOWING CONSTANTS INDICATE WHY ACCOUNTING WAS CALLED,        
+*    AND THE ACCOUNTING RECORD IS WRITTEN NOW WITH THE WORK UNIT       
+*    HAVING GONE  INDOUBT                                            */
+*/********************************************************************/
+QWACETIN,X'00000028'         /*END OF TASK - APPLICATION PROGRAM     */
+*                            /*TERMINATED - NORMAL                   */
+QWACETIA,X'0000002C'         /*END OF TASK - APPLICATION PROGRAM     */
+*                            /*ABEND SITUATION - ABNORMAL            */
+QWACEMIA,X'00000030'         /*END OF MEMORY - ABNORMAL TERMINATION  */
+*                            /*ABNORMAL                              */
+QWACCNFI,X'00000038'         /*CANCEL FORCE - STOP FORCE COMMAND     */
+*                            /*ABNORMAL                              */
+*                                                                      
 *                                                                               
 * Helper stuff for reformatting the records after selection                     
 POSITION,1                                                                      
@@ -439,12 +439,12 @@ ONE,X'00000001'                  Fullword One
 ZERO,X'00000000'                 Fullword Zero                                  
 *                                                                               
 * Constants for QPACAAFG                                                        
-AAFG_PKG,X'0000'                 Normal Package                         03900000
-AAFG_SP,C'0001'                  Stored procedure                       03900000
-AAFG_UDF,C'0002'                 User defined function                  03910000
-AAFG_TRIGGER,C'0003'             Trigger executing                      03920000
-AAFG_NATIVE_SP,C'0004'           Native SQL stored procedure            03930000
-AAFG_NON_INLINE_UDF,C'0005'      Non-inline UDF                         03940000
+AAFG_PKG,X'0000'                 Normal Package                        
+AAFG_SP,C'0001'                  Stored procedure                      
+AAFG_UDF,C'0002'                 User defined function                 
+AAFG_TRIGGER,C'0003'             Trigger executing                     
+AAFG_NATIVE_SP,C'0004'           Native SQL stored procedure           
+AAFG_NON_INLINE_UDF,C'0005'      Non-inline UDF                        
 *                                                                               
 * Application Names                                                             
 MS_IIS,C'inetinfo.exe'                                                          
