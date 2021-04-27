@@ -19,6 +19,7 @@ This initial release consists of the following JCL programs:
 * BUILDDB - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
 * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
 * BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
+* BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -92,7 +93,7 @@ If you follow the above naming convention sample reporting jobs should be able t
 **Note:** Because this is RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
 
-### Sample Reporting Job SSIDCORR
+#### Sample Reporting Job SSIDCORR
 
 This is a two step SORT job, showing many of the most useful techniques.
 It comprises two steps:
@@ -108,13 +109,32 @@ One technique of note is to concatenate further symbols to the SYMNAMES DD.
 The symbols beginning with `_` are as a result of the INREC statement.
 To make this work you need to have a `POSITION,1` statement before these symbols.
 
-### Sample Reporting Job BYMINUTE
+#### Sample Reporting Job BYMINUTE
 
 This is a single-step job, showing how you can report down at the one minute level. Arbitrary / short time granularity is one of the key benefits of Db2 DDF Analysis Tool.
 
 It creates a CSV member of the reporting data set - BYMINUTE.
 
 One interesting feature is that it reports on SQL statements **sent** separately from SQL statements **received**. So you can see to what degree the Db2 subsystem acts as a client, and to what extent it acts as a server.
+
+#### Sample Reporting Job BYSCLASS
+
+BYSCLASS is a single-step job, reporting basic statistics for each WLM Service Class for each Db2 Subsystem ID.
+
+It creates a flat file member of the reporting data set - BYSCLASS.
+
+The statistics it reports are:
+
+* Record Count
+* Commits
+* Aborts
+* Class 1 TCB (seconds)
+* Class 1 zIIP (seconds)
+* Class 2 TCB (seconds)
+* Class 2 zIIP (seconds)
+
+**Note**: The WLM Service Class is in field QWACWLME, which is only filled in for **inbound DDF** work, no other connection type and not for **outbound** DDF work. \
+There is no Service Class Period information in the SMF 101 record.
 
 ## Tailoring
 
