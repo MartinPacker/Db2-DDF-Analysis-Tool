@@ -444,7 +444,7 @@ AAFG_SP,C'0001'                  Stored procedure
 AAFG_UDF,C'0002'                 User defined function                 
 AAFG_TRIGGER,C'0003'             Trigger executing                     
 AAFG_NATIVE_SP,C'0004'           Native SQL stored procedure           
-AAFG_NON_INLINE_UDF,C'0005'      Non-inline UDF                        
+AAFG_NON_INLINE_UDF,C'0005'      Non-inline UDF                         
 *                                                                               
 * Application Names                                                             
 MS_IIS,C'inetinfo.exe'                                                          
