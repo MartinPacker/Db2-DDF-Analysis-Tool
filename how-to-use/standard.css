@@ -1,0 +1,40 @@
+<style type="text/css">
+    .blue {
+        color: #0000FF;
+    }
+
+    .red {
+        color: #FF0000;
+    }
+
+    .green {
+        color: #00DD00;
+    }
+
+    .purple {
+        color: #FF00FF;
+    }
+
+    .yellow {
+        color: #BBBB00;
+    }
+
+    .darkgreen {
+        color: #008000;
+    }
+
+    .orange {
+        color: #FFA500
+    }
+
+    .turquoise {
+        color: #00FFFF
+    }
+
+    h3:before, h2:before, h1:before
+    {
+        content:' ';
+        display:block;
+        border:1px solid black;
+    }
+</style>

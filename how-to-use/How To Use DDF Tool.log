@@ -1,0 +1,75 @@
+
+mdpre Markdown Preprocessor v0.4.6 (26 January, 2021)
+=====================================================
+- opened <stdout> for writing
+Def mdpre_date = 26 January, 2021
+Def mdpre_level = 0.4.6
+Def userid = martinpacker
+Def time = 21&colon;43
+Def date = 28 April&comma; 2021
+---> Start of metadata.md
+---> End of metadata.md
+---> Start of standard.css
+---> End of standard.css
+How To Use Db2 DDF Analysis Tool
+..... .....  Topics
+.....  What Is Db2 DDF Analysis Tool?
+..... .....  MIT Licence
+.....  What Data Does It Use?
+.....  How To Install It
+.....  How To Build A Database
+.....  How To Report Against The Database
+-----------------------------------------------------
+- Processing completed.
+-----------------------------------------------------
+
+
+md2pptx Markdown To Powerpoint Converter 2.0.1 13 April, 2021
+=============================================================
+Open source project: https://github.com/MartinPacker/md2pptx
+
+Metadata:
+=========
+
+Name                                     Value
+----                                     -----
+template                                 Martin Template.pptx
+pageTitleSize                            22
+sectionTitleSize                         30
+compactTables                            16
+numbers                                  no
+style.fgcolor.blue                       0000FF
+style.fgcolor.red                        FF0000
+style.fgcolor.green                      00DD00
+style.fgcolor.purple                     FF00FF
+style.fgcolor.yellow                     BBBB00
+style.fgcolor.darkgreen                  008000
+style.fgcolor.orange                     FFA500
+style.fgcolor.turquoise                  00FFFF
+cardcolour                               BACKGROUND 2
+cardbordercolour                         ACCENT 1
+cardshadow                               yes
+titleSlideLayout                         0
+sectionSlideLayout                       1
+contentSlideLayout                       2
+titleOnlyLayout                          5
+blankLayout                              6
+
+Using /Users/martinpacker/md2pptx/Martin Template.pptx as base for presentation
+
+Writing processing summary slide with metadata on it.
+
+Slides:
+=======
+
+   1   How To Use Db2 DDF Analysis Tool
+   2     Topics                                  
+   3   What Is Db2 DDF Analysis Tool?
+   4     MIT Licence
+   5   What Data Does It Use?
+   6   How To Install It
+   7   How To Build A Database
+   8   How To Report Against The Database
+
+Processing complete.
+Elapsed time: 0.092s
