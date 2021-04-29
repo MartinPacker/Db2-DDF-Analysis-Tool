@@ -117,6 +117,12 @@ It creates a CSV member of the reporting data set - BYMINUTE.
 
 One interesting feature is that it reports on SQL statements **sent** separately from SQL statements **received**. So you can see to what degree the Db2 subsystem acts as a client, and to what extent it acts as a server.
 
+A sample CSV file is included - BYMINUTE.csv - together with an Excel spreadsheet - BYMINUTE.xslx.
+Embedded in the spreadsheet is a graph saved as `BYMINUTE-C1C2-TCB.png`.
+It looks like this:
+
+![](BYMINUTE-C1C2-TCB.png)
+
 #### Sample Reporting Job BYSCLASS
 
 BYSCLASS is a single-step job, reporting basic statistics for each WLM Service Class for each Db2 Subsystem ID.
