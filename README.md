@@ -129,7 +129,7 @@ It creates a CSV member of the reporting data set - BYMINUTE.
 One interesting feature is that it reports on SQL statements **sent** separately from SQL statements **received**. So you can see to what degree the Db2 subsystem acts as a client, and to what extent it acts as a server.
 
 A sample CSV file is included - BYMINUTE.csv - together with an Excel spreadsheet - BYMINUTE.xslx.
-Embedded in the spreadsheet is a graph saved as `BYMINUTE-C1C2-TCB.png`.
+Embedded in the spreadsheet is a graph saved as BYMINUTE-C1C2-TCB.png.
 It looks like this:
 
 <img width= "1024px" src="BYMINUTE-C1C2-TCB.png"/>
@@ -170,6 +170,14 @@ This job writes to a subsystem-specific report PDS(E) - so you will need to tail
 For example, most JDBC applications have a Correlation ID of "db2jcc\_appli_".
 
 With a little work you could remove the Correlation ID specification, of course. Perhaps you would substitute the QWACWLME field.
+
+A sample CSV file is included - RTHOUR.csv - together with an Excel spreadsheet - RTHOUR.xslx.
+Embedded in the spreadsheet is a graph saved as JDBC-RT-Buckets.png.
+It looks like this:
+
+<img width="1024px" src="JDBC-RT-Buckets.png"/>
+
+This report was created by the RTHOUR step.
 
 ## Tailoring
 
