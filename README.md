@@ -20,6 +20,7 @@ This initial release consists of the following JCL programs:
 * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
 * BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
 * BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
+* BUCKETS - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -38,7 +39,7 @@ To install the code:
 1. Edit and submit the ASMEXIT job, assembling and link editing into a load library of your choosing.
 `<SDSNMACS>` needs to be changed to point at your Db2 installation macro library.
 1. Extract a small set of SMF 101 data and point at it (via SORTIN) in an edited version of the BUILDDB job.
-1. Create a reporting data set, as outlined in [Reporting](#reporting).
+1. Create reporting data sets, as outlined in [Reporting](#reporting).
 1. Tailor and run the SSIDCORR sample reporting program - to verify it all works correctly.
 
 All the jobs should return RC=0. The test with the small set of SMF 101 data should suffice for Installation Verification.
@@ -47,7 +48,7 @@ All the jobs should return RC=0. The test with the small set of SMF 101 data sho
 
 Note the line
 
-    DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM) 
+    DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM) 
 
 This member is the SORT Symbols deck (SYMNAMES DD) the build job and reporting jobs will use to map the flat files created by BUILDDB.
 
@@ -73,12 +74,12 @@ The most common symptom of running the database build against compressed data is
 
 Reporting jobs, obviously need to point to the right "database" input data sets.
 
-Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)` to map the database data sets.
+Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)` to map the database data sets.
 
 **Pro Tip:** You can concatenate your own symbols deck after this symbols file.
 Generally I use inline symbols, but you can "harden" them in a file of your own.
 
-You will need to allocate a report data set. It should be a PDS(E) with a LRECL of at least 4096 and a RECFM of VB.
+You will need to allocate a report data set - for reports that cover **all** the Db2 subsystems. It should be a PDS(E) with a LRECL of at least 4096 and a RECFM of VB.
 
 Here's a sample JCL step to allocate the reporting data set.
 
@@ -88,9 +89,19 @@ Here's a sample JCL step to allocate the reporting data set.
     //            DCB=(RECFM=VB,BLKSIZE=0,LRECL=4096),
     //            DSN=<HLQ>.<QUAL2>.DDF.REPORTS
 
+For some reports you will need to allocate a report data set for reports that cover **a specific** Db2 subsystem. It should be a PDS(E) with a LRECL of at least 4096 and a RECFM of VB.
+
+Here's a sample JCL step to allocate the reporting data set.
+
+    //ALDDFRPT EXEC PGM=IEFBR14
+    //REPORT   DD DISP=(NEW,CATLG),
+    //            SPACE=(CYL,(50,50,20)),UNIT=<UNIT>,
+    //            DCB=(RECFM=VB,BLKSIZE=0,LRECL=4096),
+    //            DSN=<HLQ>.<QUAL2>.DDF.<SMFID><SSID>.REPORTS
+
 If you follow the above naming convention sample reporting jobs should be able to allocate it, writing the reports to its members.
 
-**Note:** Because this is RECFM=VB you could make the LRECL even larger than 4096.
+**Note:** Because these are RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
 
 #### Sample Reporting Job SSIDCORR
@@ -121,7 +132,7 @@ A sample CSV file is included - BYMINUTE.csv - together with an Excel spreadshee
 Embedded in the spreadsheet is a graph saved as `BYMINUTE-C1C2-TCB.png`.
 It looks like this:
 
-![](BYMINUTE-C1C2-TCB.png)
+<img width= "1024px" src="BYMINUTE-C1C2-TCB.png"/>
 
 #### Sample Reporting Job BYSCLASS
 
@@ -141,6 +152,24 @@ The statistics it reports are:
 
 **Note**: The WLM Service Class is in field QWACWLME, which is only filled in for **inbound DDF** work, no other connection type and not for **outbound** DDF work. \
 There is no Service Class Period information in the SMF 101 record.
+
+#### Sample Reporting Job BUCKETS
+
+BUCKETS is a multi-step job. It produces a number of reports:
+
+* RTMIN - Response Time Buckets By Minute
+* RTHOUR - Response Time Buckets By Hour
+* CPUMIN - Class 1 CPU Time Time Buckets By Minute
+* CPUHOUR - Class 1 CPU Time Time Buckets By Hour
+* C1C2MIN - Class 1 / 2 Times By Minute
+* C1C2HOUR - Class 1 / 2 Times By Hour
+
+The RUNSYMS step that precedes the report generation step allows you to change the bucket boundaries.
+
+This job writes to a subsystem-specific report PDS(E) - so you will need to tailor `<SMFID>` and `<SSID>`. It is also specific to one Correlation ID, so you will need to change `<CORRID>` to the Correlation ID you want to report on.
+For example, most JDBC applications have a Correlation ID of "db2jcc\_appli_".
+
+With a little work you could remove the Correlation ID specification, of course. Perhaps you would substitute the QWACWLME field.
 
 ## Tailoring
 
