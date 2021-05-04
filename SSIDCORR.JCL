@@ -13,7 +13,7 @@
 //REPORT   DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(SUMSSIDS)                              
 //SYMNAMES DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
+//         DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)                                      
 //         DD *                                                                 
 * RESULTS OF INREC                                                              
 POSITION,1                                                                      
@@ -165,7 +165,7 @@ _ZIIP_EL,*,8,BI
 //REPORT   DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(SUMCORRS)                              
 //SYMNAMES DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
+//         DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)                                      
 //         DD *                                                                 
 * RESULTS OF INREC                                                              
 POSITION,1                                                                      

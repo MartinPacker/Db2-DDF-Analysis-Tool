@@ -69,7 +69,7 @@
 //             DATACLAS=<DATACLASS>,                                            
 //         DCB=*.SORTIN,RECFM=VB                                                
 //SYMNAMES DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
+//         DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)                               
 //*                                                                             
 //SYSIN    DD  *                                                                
 * Always keep the following statements in                                       

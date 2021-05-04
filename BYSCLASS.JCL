@@ -14,7 +14,7 @@
 //REPORT   DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(BYSCLASS)                              
 //SYMNAMES DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
+//         DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)                                      
 //         DD *                                                                 
 * RESULTS OF INREC                                                              
 POSITION,1                                                                      

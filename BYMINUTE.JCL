@@ -8,12 +8,10 @@
 //         DSN=<HLQ>.<QUAL2>.DDF.FLAT.CLIOTHER                                  
 //         DD DISP=SHR,                                                         
 //         DSN=<HLQ>.<QUAL2>.DDF.FLAT.MFDB2DDF                                  
-//         DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.DDF.FLAT.JDBCDDF                                  
-//REPORT   DD DISP=SHR, 
-//         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(BYMINUTE)
+//REPORT   DD DISP=SHR,                                                         
+//         DSN=<HLQ>.<QUAL2>.DDF.REPORTS(BYMINUTE)                              
 //SYMNAMES DD DISP=SHR,                                                         
-//         DSN=<HLQ>.<QUAL2>.PMSERV.CTL(DDFIDSYM)                               
+//         DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)                                      
 //         DD *                                                                 
 * RESULTS OF INREC                                                              
 POSITION,1                                                                      
