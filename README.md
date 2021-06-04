@@ -190,14 +190,22 @@ This report was created by the RTHOUR step.
 SSIDMIN is a single step job. It produces a single report, showing activity to individual subsystems:
 
 * Up to 8 named SMFID / Subsystem pairs
-* Activity in the data to subsystems not named
+* Activity in the data to subsystems not named - "Other"
 
 You might use the latter to add to the former.
 
-It's feasible to reduce the number of subsystem, or indeed to increase it. \
-This is quite a fiddly job so editing will need quite a lot of care.
+It's feasible to reduce the number of subsystems, or indeed to increase it. This is quite a fiddly job so editing will need quite a lot of care.
 
+Before you run the job, tailor the `SMFIDn` and `SSIDn` symbols to refer to your subsystems. In this sample the first two are filled in to show you how to do it.
 
+You can also cut down the records processed, for example restricting them to a particular WLM Service Class. Commented out is an `INCLUDE` statement that limits the records to those with Service Class "DDFHOT".
+
+The output is a CSV file. Pulling this into your spreadsheet program you might like to massage the spreadsheet:
+
+* Remove the columns for blank subsystems.
+* Edit the timestamps to remove part or all of the date.
+
+From there a simple step would be to create a graph showing the commits per minute by subsystem.
 
 ## Tailoring
 
