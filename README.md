@@ -76,7 +76,7 @@ The most common symptom of running the database build against compressed data is
 
 ### Preparing For Reporting
 
-Reporting jobs, obviously need to point to the right "database" input data sets.
+Reporting jobs obviously need to point to the right "database" input data sets.
 
 Note again the need to use the edited name for `DSN=<HLQ>.<QUAL2>.CTL(DDFIDSYM)` to map the database data sets.
 
@@ -184,6 +184,20 @@ It looks like this:
 <img width="1024px" src="JDBC-RT-Buckets.png"/>
 
 This report was created by the RTHOUR step.
+
+#### SSIDMIN
+
+SSIDMIN is a single step job. It produces a single report, showing activity to individual subsystems:
+
+* Up to 8 named SMFID / Subsystem pairs
+* Activity in the data to subsystems not named
+
+You might use the latter to add to the former.
+
+It's feasible to reduce the number of subsystem, or indeed to increase it. \
+This is quite a fiddly job so editing will need quite a lot of care.
+
+
 
 ## Tailoring
 
