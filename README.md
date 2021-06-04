@@ -207,6 +207,10 @@ The output is a CSV file. Pulling this into your spreadsheet program you might l
 
 From there a simple step would be to create a graph showing the commits per minute by subsystem.
 
+Included are slightly abridged versions of the CSV file SSIDMIN creates, together with a spreadsheet derived from it - SSIDMIN.xlsx. That spreadsheet contains a graph, showing commits per minute by subsystem:
+
+![](SSIDMIN.png)
+
 ## Tailoring
 
 You will need to globally edit the following variables to suit your environment:
