@@ -13,14 +13,18 @@ This tool has only (recently) been tested with Db2 Versions 11 and 12, though it
 
 ## Repository Contents
 
-This initial release consists of the following JCL programs:
+This repository consists of the following JCL programs:
 
-* ASMEXIT - to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
-* BUILDDB - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
-* SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
-* BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
-* BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
-* BUCKETS - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
+* One-time installation:
+  * ASMEXIT - to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
+* Database build:
+  * BUILDDB - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
+* Reporting:
+  * BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
+  * BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
+  * BUCKETS - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
+  * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
+  * SSIDMIN - to run a 1-step program that reports on all the named Db2 subsystem IDs at the 1-minute level.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -104,7 +108,9 @@ If you follow the above naming convention sample reporting jobs should be able t
 **Note:** Because these are RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
 
-#### Sample Reporting Job SSIDCORR
+#### Sample Reporting jobs
+
+##### SSIDCORR
 
 This is a two step SORT job, showing many of the most useful techniques.
 It comprises two steps:
@@ -120,7 +126,7 @@ One technique of note is to concatenate further symbols to the SYMNAMES DD.
 The symbols beginning with `_` are as a result of the INREC statement.
 To make this work you need to have a `POSITION,1` statement before these symbols.
 
-#### Sample Reporting Job BYMINUTE
+##### BYMINUTE
 
 This is a single-step job, showing how you can report down at the one minute level. Arbitrary / short time granularity is one of the key benefits of Db2 DDF Analysis Tool.
 
@@ -134,7 +140,7 @@ It looks like this:
 
 <img width= "1024px" src="BYMINUTE-C1C2-TCB.png"/>
 
-#### Sample Reporting Job BYSCLASS
+##### BYSCLASS
 
 BYSCLASS is a single-step job, reporting basic statistics for each WLM Service Class for each Db2 Subsystem ID.
 
@@ -153,7 +159,7 @@ The statistics it reports are:
 **Note**: The WLM Service Class is in field QWACWLME, which is only filled in for **inbound DDF** work, no other connection type and not for **outbound** DDF work. \
 There is no Service Class Period information in the SMF 101 record.
 
-#### Sample Reporting Job BUCKETS
+##### BUCKETS
 
 BUCKETS is a multi-step job. It produces a number of reports:
 
