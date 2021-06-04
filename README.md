@@ -211,6 +211,8 @@ Included are slightly abridged versions of the CSV file SSIDMIN creates, togethe
 
 ![](SSIDMIN.png)
 
+**NOTE:** It's not difficult to tweak this sample to report by the second, or by the hour. The former would be good to detect "sloshing" or "hiatuses".
+
 ## Tailoring
 
 You will need to globally edit the following variables to suit your environment:
