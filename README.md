@@ -74,7 +74,7 @@ Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 The best way to decompress the data is by assembling, link-editing and running the Db2-supplied DSNTSMFD program. It is in the Db2 SDSNSAMP library.
 The most common symptom of running the database build against compressed data is a S0C7 ABEND.
 
-### Reporting
+### Preparing For Reporting
 
 Reporting jobs, obviously need to point to the right "database" input data sets.
 
@@ -108,9 +108,9 @@ If you follow the above naming convention sample reporting jobs should be able t
 **Note:** Because these are RECFM=VB you could make the LRECL even larger than 4096.
 There is no space wasted with a long LRECL because the RECFM is VB.
 
-#### Sample Reporting jobs
+### Sample Reporting jobs
 
-##### SSIDCORR
+#### SSIDCORR
 
 This is a two step SORT job, showing many of the most useful techniques.
 It comprises two steps:
@@ -126,7 +126,7 @@ One technique of note is to concatenate further symbols to the SYMNAMES DD.
 The symbols beginning with `_` are as a result of the INREC statement.
 To make this work you need to have a `POSITION,1` statement before these symbols.
 
-##### BYMINUTE
+#### BYMINUTE
 
 This is a single-step job, showing how you can report down at the one minute level. Arbitrary / short time granularity is one of the key benefits of Db2 DDF Analysis Tool.
 
@@ -140,7 +140,7 @@ It looks like this:
 
 <img width= "1024px" src="BYMINUTE-C1C2-TCB.png"/>
 
-##### BYSCLASS
+#### BYSCLASS
 
 BYSCLASS is a single-step job, reporting basic statistics for each WLM Service Class for each Db2 Subsystem ID.
 
@@ -159,7 +159,7 @@ The statistics it reports are:
 **Note**: The WLM Service Class is in field QWACWLME, which is only filled in for **inbound DDF** work, no other connection type and not for **outbound** DDF work. \
 There is no Service Class Period information in the SMF 101 record.
 
-##### BUCKETS
+#### BUCKETS
 
 BUCKETS is a multi-step job. It produces a number of reports:
 
