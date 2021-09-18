@@ -228,3 +228,9 @@ For some reporting jobs you will need to edit two variables to tailor the report
 
 * **&lt;SMFID&gt;** - System SMFID e.g. `SYSA`.
 * **&lt;SSID&gt;** - Db2 Subsystem Name e.g. `DB2P`.
+
+## Database Files
+
+We use the term "database" but it's really a collection of flat files. \
+These contain a combination of binary values and EBCDIC strings. \
+While you could convert them to ASCII and process them off the mainframe none of the current examples do this.
