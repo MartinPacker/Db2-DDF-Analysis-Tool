@@ -240,7 +240,7 @@ Depending on the input data the following data set low-level qualifiers will con
 |Low Level<br/>Qualifier|Accounting<br/>Trace</br>Classes|Level|Description|
 |:-|:-|:-|:-|
 |CLSRVDDF|1, 2, 3|Plan|Type "SQL" such Microsoft IIS|
-|MFDB2DDF|1, 2, 3|Plan|All z/OS client work|
+|MFDB2DDF|1, 2, 3|Plan|All z/OS client work (Type "DSN")|
 |JDBCDDF|1, 2, 3|Plan|Type "JCC" i.e. JDBC|
 |CLICICS|1, 2, 3|Plan|z/OS CICS client|
 |CLIBATCH|1, 2, 3|Plan|z/OS JES Batch client|
