@@ -237,6 +237,17 @@ While you could convert them to ASCII and process them off the mainframe none of
 
 Depending on the input data the following data set low-level qualifiers will contain data:
 
-|Low Level<br/>Qualifier|Accounting<br/>Trace</br>Classes|Description|
-|:-|:-|:-|
-|IFCID239|7, 8, 10|Package-Level Information|
+|Low Level<br/>Qualifier|Accounting<br/>Trace</br>Classes|Level|Description|
+|:-|:-|:-|:-|
+|CLSRVDDF|1, 2, 3|Plan|Type "SQL" such Microsoft IIS|
+|MFDB2DDF|1, 2, 3|Plan|All z/OS client work|
+|JDBCDDF|1, 2, 3|Plan|Type "JCC" i.e. JDBC|
+|CLICICS|1, 2, 3|Plan|z/OS CICS client|
+|CLIBATCH|1, 2, 3|Plan|z/OS JES Batch client|
+|CLIOTHER|1, 2, 3|Plan|Other clients e.g. OS/400|
+|IFCID239|7, 8, 10|Package|Package-Level Information|
+
+If a particular kind of data is missing the data set will still be created with the corresponding low-level qualifier but the data set will be empty.
+
+The above are the **permanent** data sets.
+Others might get created as a by-product of reporting.
