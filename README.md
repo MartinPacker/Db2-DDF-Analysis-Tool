@@ -231,6 +231,6 @@ For some reporting jobs you will need to edit two variables to tailor the report
 
 ## Database Files
 
-We use the term "database" but it's really a collection of flat files. \
-These contain a combination of binary values and EBCDIC strings. \
+We use the term "database" but it's really a collection of flat files.
+These contain a combination of binary values and EBCDIC strings.
 While you could convert them to ASCII and process them off the mainframe none of the current examples do this.
