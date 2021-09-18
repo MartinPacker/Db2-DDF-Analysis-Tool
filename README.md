@@ -70,6 +70,9 @@ You probably want to build the database more than just on a one-off basis.
 Once you've established the BUILDDB job works you can modify it so the SORTIN DD points to an appropriate source.
 Likewise you can modify the OUTFIL data sets to point to appropriate targets.
 
+The database files follow a naming convention.
+The low-level qualifiers are documented in [Database Files](#database-files).
+
 **Note:** If you have turned on Db2's Accounting Trace Compression you will need to decompress the records before passing them to the database build job.
 The best way to decompress the data is by assembling, link-editing and running the Db2-supplied DSNTSMFD program. It is in the Db2 SDSNSAMP library.
 The most common symptom of running the database build against compressed data is a S0C7 ABEND.
