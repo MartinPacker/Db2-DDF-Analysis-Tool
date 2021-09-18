@@ -234,3 +234,9 @@ For some reporting jobs you will need to edit two variables to tailor the report
 We use the term "database" but it's really a collection of flat files.
 These contain a combination of binary values and EBCDIC strings.
 While you could convert them to ASCII and process them off the mainframe none of the current examples do this.
+
+Depending on the input data the following data set low-level qualifiers will contain data:
+
+|Low Level<br/>Qualifier|Accounting<br/>Trace</br>Classes|Description|
+|:-|:-|:-|
+|IFCID239|7, 8, 10|Package-Level Information|
