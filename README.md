@@ -23,6 +23,7 @@ This repository consists of the following JCL programs:
   * BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
   * BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
   * BUCKETS - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
+  * BUCKETS2 - similar to BUCKETS but with more and different buckets.
   * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
   * SSIDMIN - to run a 1-step program that reports on all the named Db2 subsystem IDs at the 1-minute level.
 
@@ -173,7 +174,7 @@ BUCKETS is a multi-step job. It produces a number of reports:
 * C1C2MIN - Class 1 / 2 Times By Minute
 * C1C2HOUR - Class 1 / 2 Times By Hour
 
-The RUNSYMS step that precedes the report generation step allows you to change the bucket boundaries.
+The RUNSYMS step that precedes the report generation step allows you to change the bucket boundaries. (It doesn't fix up the headings which you would also need to adjust. By then you're probably better off with [BUCKETS2](#buckets2))
 
 This job writes to a subsystem-specific report PDS(E) - so you will need to tailor `<SMFID>` and `<SSID>`. It is also specific to one Correlation ID, so you will need to change `<CORRID>` to the Correlation ID you want to report on.
 For example, most JDBC applications have a Correlation ID of "db2jcc\_appli_".
@@ -187,6 +188,27 @@ It looks like this:
 <img width="1024px" src="JDBC-RT-Buckets.png"/>
 
 This report was created by the RTHOUR step.
+
+#### BUCKETS2
+
+BUCKETS2 is identical to [BUCKETS](#buckets) - but with more buckets. The motivation for more buckets was that - in practice - both response times and especially TCB times tended to be overwhelmingly towards the bottom end so more definition there was needed.)
+
+It was created so that anyone using (and perhaps preferring) the buckets created in BUCKETS would still be able to use it.
+
+Additional buckets were created:
+
+* For both response time per commit and TCB time per commit
+* Additional buckets were created at the low i.e. for shorter values.
+* Some existing bucket boundaries were adjusted. (Headings now talk in terms of microseconds, milliseconds, and 
+and seconds. This necessitated some adjustments.)
+
+As noted in [BUCKETS](#buckets) you can adjust the RUNSYMS step symbols to use different bucket boundaries. But adding buckets needs a little more care than just adding new symbols:
+
+* `INREC WHEN=INIT` needs more zero'ed counters.
+* `INREC IFTHEN` needs more conditions and the last one adjusted to point to the final bucket.
+* `SUM` needs to sum the additional buckets.
+* `OUTFIL HEADER1` needs more headings.
+* `OUTFIL OUTREC` needs more output fields.
 
 #### SSIDMIN
 
