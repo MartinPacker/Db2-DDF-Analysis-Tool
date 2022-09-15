@@ -15,17 +15,17 @@ This tool has only (recently) been tested with Db2 Versions 11 and 12, though it
 
 This repository consists of the following JCL programs:
 
-* One-time installation:
-  * ASMEXIT - to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
+* [One-time installation](#installation):
+  * [ASMEXIT](#installation) - to assemble an E15 exit that reformats the SMF 101 records. (The $ASM procedure is included for this purpose.)
 * Database build:
-  * BUILDDB - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
-* Reporting:
-  * BYMINUTE - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
-  * BYSCLASS - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
-  * BUCKETS - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
-  * BUCKETS2 - similar to BUCKETS but with more and different buckets.
-  * SSIDCORR - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
-  * SSIDMIN - to run a 1-step program that reports on all the named Db2 subsystem IDs at the 1-minute level.
+  * [BUILDDB](#building-the-database) - to read SMF 101 data and, using the exit and SORT to write a number of flat files. These files are what reporting code (generally SORT but could be eg REXX) can run against.
+* [Reporting](#sample-reporting-jobs):
+  * [BYMINUTE](#byminute) - to run a 1-step sample program that reports on a single subsystem at a 1-minute level.
+  * [BYSCLASS](#bysclass) - to run a 1-step sample program that reports basic statistics for each WLM Service Class for each Db2 Subsystem ID.
+  * [BUCKETS](#buckets) - to run queries that create counts of transaction endings by minute and hour as buckets - for CPU and Response Time analysis.
+  * [BUCKETS2](#buckets2) - similar to BUCKETS but with more and different buckets.
+  * [SSIDCORR](#ssidcorr) - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
+  * [SSIDMIN](#ssidmin) - to run a 1-step program that reports on all the named Db2 subsystem IDs at the 1-minute level.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -114,22 +114,6 @@ There is no space wasted with a long LRECL because the RECFM is VB.
 
 ### Sample Reporting jobs
 
-#### SSIDCORR
-
-This is a two step SORT job, showing many of the most useful techniques.
-It comprises two steps:
-
-1. SUMSSIDS - Producing a list of Db2 subsystem IDs
-1. SUMCORRS - Producting a list of Db2 correlation IDs
-
-The output from this will be two Comma-Separated-Value (CSV) members of the reporting data set - SUMSSIDS and SUMCORRS.
-A reasonable step would be to download these and import them into a spreadsheet, where you could sort them on a number of columns and report on them.
-(This repository doesn't currently contain any workstation code.)
-
-One technique of note is to concatenate further symbols to the SYMNAMES DD.
-The symbols beginning with `_` are as a result of the INREC statement.
-To make this work you need to have a `POSITION,1` statement before these symbols.
-
 #### BYMINUTE
 
 This is a single-step job, showing how you can report down at the one minute level. Arbitrary / short time granularity is one of the key benefits of Db2 DDF Analysis Tool.
@@ -199,16 +183,31 @@ Additional buckets were created:
 
 * For both response time per commit and TCB time per commit
 * Additional buckets were created at the low i.e. for shorter values.
-* Some existing bucket boundaries were adjusted. (Headings now talk in terms of microseconds, milliseconds, and 
-and seconds. This necessitated some adjustments.)
+* Some existing bucket boundaries were adjusted. (Headings now talk in terms of microseconds, milliseconds, and seconds. This necessitated some adjustments.)
 
 As noted in [BUCKETS](#buckets) you can adjust the RUNSYMS step symbols to use different bucket boundaries. But adding buckets needs a little more care than just adding new symbols:
 
 * `INREC WHEN=INIT` needs more zero'ed counters.
-* `INREC IFTHEN` needs more conditions and the last one adjusted to point to the final bucket.
+* `INREC IFTHEN` needs more conditions and the final `WHEN=NONE` adjusted to point to the final bucket.
 * `SUM` needs to sum the additional buckets.
 * `OUTFIL HEADER1` needs more headings.
 * `OUTFIL OUTREC` needs more output fields.
+
+#### SSIDCORR
+
+This is a two step SORT job, showing many of the most useful techniques.
+It comprises two steps:
+
+1. SUMSSIDS - Producing a list of Db2 subsystem IDs
+1. SUMCORRS - Producting a list of Db2 correlation IDs
+
+The output from this will be two Comma-Separated-Value (CSV) members of the reporting data set - SUMSSIDS and SUMCORRS.
+A reasonable step would be to download these and import them into a spreadsheet, where you could sort them on a number of columns and report on them.
+(This repository doesn't currently contain any workstation code.)
+
+One technique of note is to concatenate further symbols to the SYMNAMES DD.
+The symbols beginning with `_` are as a result of the INREC statement.
+To make this work you need to have a `POSITION,1` statement before these symbols.
 
 #### SSIDMIN
 
