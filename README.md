@@ -26,6 +26,7 @@ This repository consists of the following JCL programs:
   * [BUCKETS2](#buckets2) - similar to BUCKETS but with more and different buckets.
   * [SSIDCORR](#ssidcorr) - to run a 2-step sample program that reports Db2 subsystem IDs and correlation IDs.
   * [SSIDMIN](#ssidmin) - to run a 1-step program that reports on all the named Db2 subsystem IDs at the 1-minute level.
+  * [SQLACCT](#sqlacct) - to run a 2-step program that reports on SQL statement counts - by subsystem and then by correlation ID.
 
 The intention is to add more reporting samples, and for users to generate their own. If they'd like to contribute them to this **open source** project that would be great.)
 
@@ -236,6 +237,21 @@ Included are slightly abridged versions of the CSV file SSIDMIN creates, togethe
 ![](SSIDMIN.png)
 
 **NOTE:** It's not difficult to tweak this sample to report by the second, or by the hour. The former would be good to detect "sloshing" or "hiatuses".
+
+#### SQLACCT
+
+SQLACCT is a two step job. It produces two reports:
+
+* SQL statistics at the subsystem level by date
+* SQL statistics at the subsystem and correlation ID level by date
+
+The output is a pair of CSV files. Pulling these into your spreadsheet program you might like to massage the spreadsheets:
+
+* Divide the SQL counts by the number of commits+aborts.
+
+Here is a graph created from the second report - once the division by the number of commits + aborts has been done:
+
+![](SQLACCT.png)
 
 ## Tailoring
 
