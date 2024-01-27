@@ -25,6 +25,7 @@ _DATE,*,4,PD
 _RECORDS,*,4,BI                                                                 
 _COMMITS,*,4,BI                                                                 
 _ABORTS,*,4,BI                                                                  
+_COMMABORT,*,4,BI                                                               
 _SELECT,*,8,BI                                                                  
 _INSERT,*,8,BI                                                                  
 _UPDATE,*,8,BI                                                                  
@@ -36,6 +37,11 @@ _CLOSE,*,8,BI
 _FETCH,*,8,BI                                                                   
 _CALLSP,*,8,BI                                                                  
 _CALLUDF,*,8,BI                                                                 
+_QXSTFND,*,8,BI                                                                 
+_QXSTNFND,*,8,BI                                                                
+_QXSTNPRP,*,8,BI                                                                
+_QXSTIPRP,*,8,BI                                                                
+_QXSTDINV,*,8,BI                                                                
 /*                                                                              
 //*                                                                             
 //SYSIN    DD  *                                                                
@@ -47,6 +53,7 @@ _CALLUDF,*,8,BI
      ONE,                                                                       
      QWACCOMM,                                                                  
      QWACABRT,                                                                  
+     COMMABORT,                                                                 
      QXSELECT,                                                                  
      QXINSRT,                                                                   
      QXUPDTE,                                                                   
@@ -57,7 +64,12 @@ _CALLUDF,*,8,BI
      QXCLOSE,                                                                   
      QXFETCH,                                                                   
      CALLSP,                                                                    
-     CALLUDF)                                                                   
+     CALLUDF,                                                                   
+     QXSTFND,                                                                   
+     QXSTNFND,                                                                  
+     QXSTNPRP,                                                                  
+     QXSTIPRP,                                                                  
+     QXSTDINV)                                                                  
 *                                                                               
  SORT FIELDS=(_SMFID,A,                                                         
   _SSID,A,                                                                      
@@ -66,6 +78,7 @@ _CALLUDF,*,8,BI
  SUM FIELDS=(_RECORDS,                                                          
    _COMMITS,                                                                    
    _ABORTS,                                                                     
+   _COMMABORT,                                                                  
    _SELECT,                                                                     
    _INSERT,                                                                     
    _UPDATE,                                                                     
@@ -76,7 +89,12 @@ _CALLUDF,*,8,BI
    _CLOSE,                                                                      
    _FETCH,                                                                      
    _CALLSP,                                                                     
-   _CALLUDF)                                                                    
+   _CALLUDF,                                                                    
+   _QXSTFND,                                                                    
+   _QXSTNFND,                                                                   
+   _QXSTNPRP,                                                                   
+   _QXSTIPRP,                                                                   
+   _QXSTDINV)                                                                   
 *                                                                               
  OUTFIL FNAMES=REPORT,REMOVECC,                                                 
  HEADER1=(C'"By Subsystem By Day",',                                            
@@ -98,6 +116,27 @@ _CALLUDF,*,8,BI
    C'"FETCH",',                                                                 
    C'"Call SP",',                                                               
    C'"Call UDF",',                                                              
+   C'"Global Hit",',                                                            
+   C'"Global Miss",',                                                           
+   C'"Local Hit",',                                                             
+   C'"Local Miss",',                                                            
+   C'"Local Invalidated",',                                                     
+   C'"SELECTs Per",',                                                           
+   C'"INSERTs Per",',                                                           
+   C'"UPDATEs Per",',                                                           
+   C'"DELETEs Per",',                                                           
+   C'"DESCRIBEs Per",',                                                         
+   C'"PREPAREs Per",',                                                          
+   C'"OPENs Per",',                                                             
+   C'"CLOSEs Per",',                                                            
+   C'"FETCHes Per",',                                                           
+   C'"Call SPs Per",',                                                          
+   C'"Call UDFs Per",',                                                         
+   C'"Global Hit Per",',                                                        
+   C'"Global Miss Per",',                                                       
+   C'"Local Hit Per",',                                                         
+   C'"Local Miss Per",',                                                        
+   C'"Local Invalidated Per",',                                                 
    X),                                                                          
  OUTREC=(_RDW,                                                                  
    C'"',                                                                        
@@ -123,6 +162,27 @@ _CALLUDF,*,8,BI
    _FETCH,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                        
    _CALLSP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                       
    _CALLUDF,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                      
+   _QXSTFND,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                      
+   _QXSTNFND,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTNPRP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTIPRP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTDINV,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _SELECT,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _INSERT,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _UPDATE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _DELETE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _DESCRIBE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _PREPARE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _OPEN,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',                
+   _CLOSE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',               
+   _FETCH,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',               
+   _CALLSP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _CALLUDF,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _QXSTFND,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _QXSTNFND,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTNPRP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTIPRP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTDINV,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
    50X)                                                                         
  END                                                                            
 //*                                                                             
@@ -153,6 +213,7 @@ _DATE,*,4,PD
 _RECORDS,*,4,BI                                                                 
 _COMMITS,*,4,BI                                                                 
 _ABORTS,*,4,BI                                                                  
+_COMMABORT,*,4,BI                                                               
 _SELECT,*,8,BI                                                                  
 _INSERT,*,8,BI                                                                  
 _UPDATE,*,8,BI                                                                  
@@ -164,10 +225,16 @@ _CLOSE,*,8,BI
 _FETCH,*,8,BI                                                                   
 _CALLSP,*,8,BI                                                                  
 _CALLUDF,*,8,BI                                                                 
+_QXSTFND,*,8,BI                                                                 
+_QXSTNFND,*,8,BI                                                                
+_QXSTNPRP,*,8,BI                                                                
+_QXSTIPRP,*,8,BI                                                                
+_QXSTDINV,*,8,BI                                                                
 /*                                                                              
 //*                                                                             
 //SYSIN    DD  *                                                                
  INCLUDE COND=(QWACWLME,NE,X'0000000000000000')                                 
+*                                                                               
  INREC BUILD=(RDW,                                                              
      SMFID,                                                                     
      SSID,                                                                      
@@ -176,6 +243,7 @@ _CALLUDF,*,8,BI
      ONE,                                                                       
      QWACCOMM,                                                                  
      QWACABRT,                                                                  
+     COMMABORT,                                                                 
      QXSELECT,                                                                  
      QXINSRT,                                                                   
      QXUPDTE,                                                                   
@@ -186,7 +254,12 @@ _CALLUDF,*,8,BI
      QXCLOSE,                                                                   
      QXFETCH,                                                                   
      CALLSP,                                                                    
-     CALLUDF)                                                                   
+     CALLUDF,                                                                   
+     QXSTFND,                                                                   
+     QXSTNFND,                                                                  
+     QXSTNPRP,                                                                  
+     QXSTIPRP,                                                                  
+     QXSTDINV)                                                                  
 *                                                                               
  SORT FIELDS=(_SMFID,A,                                                         
   _SSID,A,                                                                      
@@ -196,6 +269,7 @@ _CALLUDF,*,8,BI
  SUM FIELDS=(_RECORDS,                                                          
    _COMMITS,                                                                    
    _ABORTS,                                                                     
+   _COMMABORT,                                                                  
    _SELECT,                                                                     
    _INSERT,                                                                     
    _UPDATE,                                                                     
@@ -206,7 +280,12 @@ _CALLUDF,*,8,BI
    _CLOSE,                                                                      
    _FETCH,                                                                      
    _CALLSP,                                                                     
-   _CALLUDF)                                                                    
+   _CALLUDF,                                                                    
+   _QXSTFND,                                                                    
+   _QXSTNFND,                                                                   
+   _QXSTNPRP,                                                                   
+   _QXSTIPRP,                                                                   
+   _QXSTDINV)                                                                   
 *                                                                               
  OUTFIL FNAMES=REPORT,REMOVECC,                                                 
  HEADER1=(C'"By Subsystem By Day",',                                            
@@ -229,6 +308,27 @@ _CALLUDF,*,8,BI
    C'"FETCH",',                                                                 
    C'"Call SP",',                                                               
    C'"Call UDF",',                                                              
+   C'"Global Hit",',                                                            
+   C'"Global Miss",',                                                           
+   C'"Local Hit",',                                                             
+   C'"Local Miss",',                                                            
+   C'"Local Invalidated",',                                                     
+   C'"SELECTs Per",',                                                           
+   C'"INSERTs Per",',                                                           
+   C'"UPDATEs Per",',                                                           
+   C'"DELETEs Per",',                                                           
+   C'"DESCRIBEs Per",',                                                         
+   C'"PREPAREs Per",',                                                          
+   C'"OPENs Per",',                                                             
+   C'"CLOSEs Per",',                                                            
+   C'"FETCHes Per",',                                                           
+   C'"Call SPs Per",',                                                          
+   C'"Call UDFs Per",',                                                         
+   C'"Global Hit Per",',                                                        
+   C'"Global Miss Per",',                                                       
+   C'"Local Hit Per",',                                                         
+   C'"Local Miss Per",',                                                        
+   C'"Local Invalidated Per",',                                                 
    X),                                                                          
  OUTREC=(_RDW,                                                                  
    C'"',                                                                        
@@ -257,6 +357,27 @@ _CALLUDF,*,8,BI
    _FETCH,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                        
    _CALLSP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                       
    _CALLUDF,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                      
+   _QXSTFND,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                      
+   _QXSTNFND,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTNPRP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTIPRP,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _QXSTDINV,EDIT=(IIIIIIIIIIIIIIIIT),C',',                                     
+   _SELECT,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _INSERT,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _UPDATE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _DELETE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _DESCRIBE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _PREPARE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _OPEN,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',                
+   _CLOSE,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',               
+   _FETCH,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',               
+   _CALLSP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',              
+   _CALLUDF,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _QXSTFND,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',             
+   _QXSTNFND,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTNPRP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTIPRP,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
+   _QXSTDINV,MUL,+1000,DIV,_COMMABORT,EDIT=(IIIIIIIIIIIIT.TTT),C',',            
    50X)                                                                         
  END                                                                            
 /*                                                                              
