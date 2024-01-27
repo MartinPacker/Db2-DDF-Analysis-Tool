@@ -245,11 +245,8 @@ SQLACCT is a two step job. It produces two reports:
 * SQL statistics at the subsystem level by date
 * SQL statistics at the subsystem and correlation ID level by date
 
-The output is a pair of CSV files. Pulling these into your spreadsheet program you might like to massage the spreadsheets:
-
-* Divide the SQL counts by the number of commits+aborts.
-
-Here is a graph created from the second report - once the division by the number of commits + aborts has been done:
+The output is a pair of CSV files. 
+Here is a graph created from the second report.
 
 ![](SQLACCT.png)
 
